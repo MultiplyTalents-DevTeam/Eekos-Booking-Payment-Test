@@ -1,0 +1,326 @@
+@media (max-width: 1200px) {
+  #eekos-room-selector .eekos-room-card,
+  #eekos-room-selector .eekos-booking-dialog {
+    grid-template-columns: 1fr;
+  }
+
+  #eekos-room-selector .eekos-room-content,
+  #eekos-room-selector .eekos-room-cta,
+  #eekos-room-selector .eekos-booking-side {
+    border-left: 0;
+    border-top: 1px solid var(--eekos-border-soft);
+  }
+
+  #eekos-room-selector .eekos-room-cta {
+    padding-top: 28px;
+  }
+}
+
+@media (max-width: 991px) {
+  #eekos-room-selector .eekos-room-toolbar {
+    align-items: flex-start;
+  }
+
+  #eekos-room-selector .eekos-toolbar-label {
+    width: 100%;
+    margin-right: 0;
+  }
+
+  #eekos-room-selector .eekos-room-content,
+  #eekos-room-selector .eekos-room-cta {
+    padding: 28px 24px;
+  }
+
+  #eekos-room-selector .eekos-room-actions .eekos-btn {
+    width: 100%;
+  }
+
+  #eekos-room-selector .eekos-booking-side {
+    gap: 14px;
+  }
+
+  #eekos-room-selector .eekos-pricing-review {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 767px) {
+  #eekos-room-selector .eekos-room-toolbar {
+    gap: 10px;
+  }
+
+  #eekos-room-selector .eekos-toolbar-label {
+    font-size: 11px;
+  }
+
+  #eekos-room-selector .eekos-pill-group {
+    width: 100%;
+    gap: 6px;
+    padding: 5px;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  #eekos-room-selector .eekos-pill-group::-webkit-scrollbar {
+    display: none;
+  }
+
+  #eekos-room-selector .eekos-pill,
+  #eekos-room-selector .eekos-feature-toggle {
+    font-size: 13px;
+    padding: 10px 14px;
+    min-height: 44px;
+    flex: 0 0 auto;
+  }
+
+  #eekos-room-selector .eekos-feature-toggle {
+    width: 100%;
+  }
+
+  #eekos-room-selector .eekos-room-meta {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  #eekos-room-selector .eekos-room-count {
+    font-size: 18px;
+  }
+
+  #eekos-room-selector .eekos-room-note {
+    text-align: left;
+    font-size: 12px;
+    line-height: 1.55;
+  }
+
+  #eekos-room-selector .eekos-room-title,
+  #eekos-room-selector .eekos-booking-title {
+    font-size: 28px;
+  }
+
+  #eekos-room-selector .eekos-room-eyebrow {
+    font-size: 11px;
+  }
+
+  #eekos-room-selector .eekos-room-specs li,
+  #eekos-room-selector .eekos-room-description,
+  #eekos-room-selector .eekos-section-copy {
+    font-size: 14px;
+  }
+
+  #eekos-room-selector .eekos-room-description,
+  #eekos-room-selector .eekos-section-copy,
+  #eekos-room-selector .eekos-confirmation-text {
+    line-height: 1.6;
+  }
+
+  #eekos-room-selector .eekos-room-tag {
+    font-size: 12px;
+    min-height: 34px;
+    padding: 8px 12px;
+  }
+
+  #eekos-room-selector .eekos-room-details-title,
+  #eekos-room-selector .eekos-room-price-label {
+    font-size: 12px;
+  }
+
+  #eekos-room-selector .eekos-room-details-list li {
+    font-size: 12px;
+    line-height: 1.5;
+  }
+
+  #eekos-room-selector .eekos-room-price-title {
+    font-size: 22px;
+  }
+
+  #eekos-room-selector .eekos-room-price-suffix {
+    font-size: 11px;
+  }
+
+  #eekos-room-selector .eekos-room-price-panel {
+    padding: 16px;
+  }
+
+  #eekos-room-selector .eekos-room-price-note {
+    font-size: 12px;
+    line-height: 1.55;
+  }
+
+  #eekos-room-selector .eekos-room-rate strong,
+  #eekos-room-selector .eekos-btn--primary,
+  #eekos-room-selector .eekos-btn--secondary,
+  #eekos-room-selector .eekos-btn--ghost {
+    font-size: 13px;
+  }
+
+  #eekos-room-selector .eekos-room-rate span,
+  #eekos-room-selector .eekos-summary-row {
+    font-size: 12px;
+    line-height: 1.5;
+  }
+
+  #eekos-room-selector .eekos-room-content,
+  #eekos-room-selector .eekos-room-cta {
+    padding: 24px 22px;
+  }
+
+  #eekos-room-selector .eekos-room-media {
+    min-height: 280px;
+  }
+
+  #eekos-room-selector .eekos-room-details-list,
+  #eekos-room-selector .eekos-field-grid {
+    grid-template-columns: 1fr;
+  }
+
+  #eekos-room-selector .eekos-room-thumbs {
+    left: 12px;
+    bottom: 12px;
+    gap: 8px;
+  }
+
+  #eekos-room-selector .eekos-room-thumb {
+    width: 58px;
+    height: 46px;
+    border-radius: 12px;
+  }
+
+  #eekos-room-selector .eekos-booking-modal {
+    padding: 0;
+  }
+
+  #eekos-room-selector .eekos-booking-dialog {
+    min-height: 100dvh;
+    margin: 0;
+    border-radius: 0;
+  }
+
+  #eekos-room-selector .eekos-booking-main {
+    padding: 20px 16px 28px;
+  }
+
+  #eekos-room-selector .eekos-booking-side {
+    padding: 18px 16px calc(18px + env(safe-area-inset-bottom, 0px));
+  }
+
+  #eekos-room-selector .eekos-booking-top {
+    position: sticky;
+    top: 0;
+    z-index: 4;
+    background: #f7f2ea;
+    padding-bottom: 12px;
+    margin-bottom: 18px;
+  }
+
+  #eekos-room-selector .eekos-booking-kicker,
+  #eekos-room-selector .eekos-step,
+  #eekos-room-selector .eekos-field label,
+  #eekos-room-selector .eekos-summary-rate,
+  #eekos-room-selector .eekos-confirmation-ref,
+  #eekos-room-selector .eekos-micro {
+    font-size: 11px;
+  }
+
+  #eekos-room-selector .eekos-section-label,
+  #eekos-room-selector .eekos-summary-title {
+    font-size: 20px;
+  }
+
+  #eekos-room-selector .eekos-summary-highlight {
+    font-size: 22px;
+  }
+
+  #eekos-room-selector .eekos-field input,
+  #eekos-room-selector .eekos-field select,
+  #eekos-room-selector .eekos-field textarea {
+    font-size: 14px;
+  }
+
+  #eekos-room-selector .eekos-summary-room-name {
+    font-size: 22px;
+  }
+
+  #eekos-room-selector .eekos-payment-amount {
+    font-size: 26px;
+  }
+
+  #eekos-room-selector .eekos-review-point {
+    padding: 14px 16px;
+  }
+
+  #eekos-room-selector .eekos-payment-copy,
+  #eekos-room-selector .eekos-summary-policy li,
+  #eekos-room-selector .eekos-confirmation-text {
+    font-size: 12px;
+  }
+
+  #eekos-room-selector .eekos-confirmation-title {
+    font-size: 24px;
+  }
+
+  #eekos-room-selector .eekos-form-actions {
+    flex-direction: column-reverse;
+    align-items: stretch;
+    padding-top: 14px;
+    border-top: 1px solid var(--eekos-border-soft);
+  }
+
+  #eekos-room-selector .eekos-form-actions .eekos-btn {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  #eekos-room-selector .eekos-room-list {
+    gap: 18px;
+  }
+
+  #eekos-room-selector .eekos-room-card {
+    border-radius: 22px;
+  }
+
+  #eekos-room-selector .eekos-room-title,
+  #eekos-room-selector .eekos-booking-title {
+    font-size: 24px;
+  }
+
+  #eekos-room-selector .eekos-summary-highlight {
+    font-size: 20px;
+  }
+
+  #eekos-room-selector .eekos-review-point strong,
+  #eekos-room-selector .eekos-review-point span {
+    font-size: 12px;
+  }
+
+  #eekos-room-selector .eekos-room-content,
+  #eekos-room-selector .eekos-room-cta {
+    padding: 20px 18px;
+  }
+
+  #eekos-room-selector .eekos-room-media {
+    min-height: 240px;
+  }
+
+  #eekos-room-selector .eekos-room-thumb {
+    width: 54px;
+    height: 42px;
+  }
+
+  #eekos-room-selector .eekos-booking-main,
+  #eekos-room-selector .eekos-booking-side {
+    padding-left: 14px;
+    padding-right: 14px;
+  }
+
+  #eekos-room-selector .eekos-summary-row {
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  #eekos-room-selector .eekos-summary-row strong {
+    text-align: left;
+  }
+}

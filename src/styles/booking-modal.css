@@ -1,0 +1,413 @@
+#eekos-room-selector [hidden] {
+  display: none;
+}
+
+#eekos-room-selector .eekos-booking-modal[hidden] {
+  display: none;
+}
+
+#eekos-room-selector .eekos-booking-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 999999;
+  background: var(--eekos-overlay);
+  padding: 24px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+#eekos-room-selector .eekos-booking-dialog {
+  width: 100%;
+  max-width: 1180px;
+  min-height: min(760px, calc(100dvh - 48px));
+  margin: 30px auto;
+  background: #f7f2ea;
+  border-radius: 28px;
+  overflow: hidden;
+  box-shadow: 0 24px 64px rgba(9, 15, 11, 0.25);
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) 360px;
+}
+
+#eekos-room-selector .eekos-booking-main {
+  padding: 34px 34px 30px;
+  min-width: 0;
+}
+
+#eekos-room-selector .eekos-booking-side {
+  background: #f2ece2;
+  border-left: 1px solid var(--eekos-border-soft);
+  padding: 34px 28px 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  min-width: 0;
+}
+
+#eekos-room-selector .eekos-booking-top {
+  display: flex;
+  justify-content: space-between;
+  gap: 18px;
+  align-items: flex-start;
+  margin-bottom: 22px;
+}
+
+#eekos-room-selector .eekos-booking-kicker {
+  margin: 0 0 8px;
+  color: #6d8a73;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+#eekos-room-selector .eekos-booking-kicker--compact {
+  margin-bottom: 8px;
+}
+
+#eekos-room-selector .eekos-booking-title,
+#eekos-room-selector .eekos-confirmation-title {
+  color: var(--eekos-heading);
+  font-family: "Nano Sans Georgian", Georgia, serif;
+  font-weight: 700;
+}
+
+#eekos-room-selector .eekos-booking-title {
+  margin: 0;
+  font-size: 34px;
+  line-height: 1.06;
+}
+
+#eekos-room-selector .eekos-modal-close {
+  appearance: none;
+  min-width: 44px;
+  width: 44px;
+  height: 44px;
+  border-radius: 999px;
+  cursor: pointer;
+  font-size: 20px;
+  line-height: 1;
+}
+
+#eekos-room-selector .eekos-stepper {
+  display: flex;
+  gap: 10px;
+  flex-wrap: nowrap;
+  margin: 0 0 16px;
+  padding-bottom: 4px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+#eekos-room-selector .eekos-stepper::-webkit-scrollbar {
+  display: none;
+}
+
+#eekos-room-selector .eekos-step {
+  min-height: 40px;
+  padding: 10px 14px;
+  border-radius: 999px;
+  background: #ece4d7;
+  color: #8a6a43;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+}
+
+#eekos-room-selector .eekos-step.is-active {
+  background: var(--eekos-green);
+  color: #ffffff;
+}
+
+#eekos-room-selector .eekos-form-feedback {
+  min-height: 22px;
+  margin: 0 0 18px;
+  padding-left: 14px;
+  border-left: 3px solid rgba(145, 75, 50, 0.26);
+  color: #914b32;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+#eekos-room-selector .eekos-form-feedback:empty {
+  display: none;
+}
+
+#eekos-room-selector .eekos-step-pane {
+  display: none;
+}
+
+#eekos-room-selector .eekos-step-pane.is-active,
+#eekos-room-selector .eekos-confirmation.is-active {
+  display: block;
+}
+
+#eekos-room-selector .eekos-section-label {
+  margin: 0 0 14px;
+  color: var(--eekos-heading);
+  font-family: "Nano Sans Georgian", Georgia, serif;
+  font-size: 22px;
+  line-height: 1.2;
+  font-weight: 700;
+}
+
+#eekos-room-selector .eekos-section-copy {
+  margin: 0 0 18px;
+  color: #7b6d5a;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+#eekos-room-selector .eekos-field-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  margin-bottom: 18px;
+}
+
+#eekos-room-selector .eekos-field {
+  display: grid;
+  gap: 8px;
+}
+
+#eekos-room-selector .eekos-field.eekos-field--full {
+  grid-column: 1 / -1;
+}
+
+#eekos-room-selector .eekos-field label,
+#eekos-room-selector .eekos-summary-rate,
+#eekos-room-selector .eekos-confirmation-ref {
+  color: #6d8a73;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+#eekos-room-selector .eekos-field input,
+#eekos-room-selector .eekos-field select,
+#eekos-room-selector .eekos-field textarea {
+  width: 100%;
+  min-height: 52px;
+  border: 1px solid var(--eekos-border);
+  border-radius: 16px;
+  background: #ffffff;
+  padding: 14px 16px;
+  color: var(--eekos-heading);
+  font-family: Arial, sans-serif;
+  font-size: 15px;
+  outline: none;
+}
+
+#eekos-room-selector .eekos-field input[aria-invalid="true"],
+#eekos-room-selector .eekos-field select[aria-invalid="true"],
+#eekos-room-selector .eekos-field textarea[aria-invalid="true"] {
+  border-color: rgba(145, 75, 50, 0.72);
+  box-shadow: 0 0 0 4px rgba(145, 75, 50, 0.1);
+}
+
+#eekos-room-selector .eekos-field textarea {
+  min-height: 112px;
+  resize: vertical;
+}
+
+#eekos-room-selector .eekos-field input:focus,
+#eekos-room-selector .eekos-field select:focus,
+#eekos-room-selector .eekos-field textarea:focus {
+  border-color: rgba(31, 92, 67, 0.5);
+  box-shadow: 0 0 0 4px rgba(31, 92, 67, 0.08);
+}
+
+#eekos-room-selector .eekos-micro,
+#eekos-room-selector .eekos-payment-copy,
+#eekos-room-selector .eekos-summary-policy li,
+#eekos-room-selector .eekos-confirmation-text {
+  color: #7b6d5a;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+#eekos-room-selector .eekos-micro {
+  margin: 0;
+}
+
+#eekos-room-selector .eekos-form-actions {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 10px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+#eekos-room-selector .eekos-form-actions--spacious {
+  margin-top: 18px;
+}
+
+#eekos-room-selector .eekos-summary-card,
+#eekos-room-selector .eekos-summary-payment,
+#eekos-room-selector .eekos-summary-policy {
+  background: #f7f2ea;
+  border: 1px solid var(--eekos-border-soft);
+  border-radius: 22px;
+  padding: 18px;
+}
+
+#eekos-room-selector .eekos-summary-payment--step {
+  margin-bottom: 18px;
+}
+
+#eekos-room-selector .eekos-pricing-review {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr);
+  gap: 16px;
+}
+
+#eekos-room-selector .eekos-review-points {
+  display: grid;
+  gap: 12px;
+}
+
+#eekos-room-selector .eekos-review-point {
+  padding: 16px 18px;
+  border: 1px solid var(--eekos-border-soft);
+  border-radius: 20px;
+  background: #fffdf8;
+}
+
+#eekos-room-selector .eekos-review-point strong {
+  display: block;
+  margin-bottom: 6px;
+  color: var(--eekos-heading);
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+#eekos-room-selector .eekos-review-point span {
+  display: block;
+  color: #7b6d5a;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+#eekos-room-selector .eekos-summary-title,
+#eekos-room-selector .eekos-summary-room-name {
+  color: var(--eekos-heading);
+  font-family: "Nano Sans Georgian", Georgia, serif;
+  font-weight: 700;
+}
+
+#eekos-room-selector .eekos-summary-title {
+  margin: 0 0 12px;
+  font-size: 20px;
+  line-height: 1.15;
+}
+
+#eekos-room-selector .eekos-summary-highlight {
+  margin: 0 0 8px;
+  color: var(--eekos-heading);
+  font-family: "Nano Sans Georgian", Georgia, serif;
+  font-size: 24px;
+  line-height: 1.15;
+  font-weight: 700;
+  max-width: 18ch;
+}
+
+#eekos-room-selector .eekos-summary-copy {
+  margin: 0 0 14px;
+  color: #7b6d5a;
+  font-size: 13px;
+  line-height: 1.6;
+  max-width: 28ch;
+}
+
+#eekos-room-selector .eekos-summary-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  color: #7b6d5a;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+#eekos-room-selector .eekos-summary-row strong,
+#eekos-room-selector .eekos-summary-room-name {
+  color: var(--eekos-heading);
+}
+
+#eekos-room-selector .eekos-summary-row strong {
+  text-align: right;
+}
+
+#eekos-room-selector .eekos-summary-room-name {
+  margin: 0 0 8px;
+  font-size: 24px;
+  line-height: 1.1;
+}
+
+#eekos-room-selector .eekos-summary-rate {
+  margin: 0 0 12px;
+}
+
+#eekos-room-selector .eekos-payment-amount {
+  margin: 0 0 8px;
+  color: var(--eekos-heading);
+  font-family: "Nano Sans Georgian", Georgia, serif;
+  font-size: 30px;
+  line-height: 1.05;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+#eekos-room-selector .eekos-summary-policy ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+#eekos-room-selector .eekos-summary-policy li {
+  position: relative;
+  padding-left: 14px;
+}
+
+#eekos-room-selector .eekos-confirmation {
+  display: none;
+  padding: 4px 0 0;
+}
+
+#eekos-room-selector .eekos-confirmation-card {
+  border: 1px solid var(--eekos-border-soft);
+  background: #ffffff;
+  border-radius: 24px;
+  padding: 22px;
+}
+
+#eekos-room-selector .eekos-confirmation-title {
+  margin: 0 0 12px;
+  font-size: 28px;
+  line-height: 1.1;
+}
+
+#eekos-room-selector .eekos-confirmation-text {
+  margin: 0 0 18px;
+}
+
+#eekos-room-selector .eekos-confirmation-ref {
+  margin-bottom: 10px;
+}
+
+#eekos-room-selector .eekos-hidden {
+  display: none;
+}
+
+#eekos-room-selector .eekos-micro.is-warning {
+  color: #8a4b34;
+}
+

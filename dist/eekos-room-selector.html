@@ -1,0 +1,2773 @@
+<style>
+#eekos-room-selector {
+  --eekos-bg: #f6f1e8;
+  --eekos-surface: #f2ece2;
+  --eekos-card: #f7f2ea;
+  --eekos-border: #d8cec0;
+  --eekos-border-soft: #e5dccf;
+  --eekos-text: #2f3b34;
+  --eekos-text-soft: #7f6d57;
+  --eekos-heading: #173629;
+  --eekos-green: #1f5c43;
+  --eekos-green-dark: #174933;
+  --eekos-gold: #d0b86d;
+  --eekos-pill: #ece4d7;
+  --eekos-shadow: 0 12px 32px rgba(23, 54, 41, 0.06);
+  --eekos-overlay: rgba(20, 26, 23, 0.62);
+
+  width: 100%;
+  font-family: Arial, sans-serif;
+  line-height: 1.5;
+  color: var(--eekos-text);
+  background: transparent;
+  -webkit-text-size-adjust: 100%;
+}
+
+#eekos-room-selector * {
+  box-sizing: border-box;
+}
+
+#eekos-room-selector .eekos-room-shell {
+  width: 100%;
+  min-width: 0;
+}
+
+#eekos-room-selector .eekos-room-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 14px;
+  margin: 0 0 24px;
+  padding: 18px 0 0;
+}
+
+#eekos-room-selector .eekos-toolbar-label {
+  color: var(--eekos-text-soft);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  margin-right: 4px;
+}
+
+#eekos-room-selector .eekos-pill-group {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  max-width: 100%;
+  padding: 6px;
+  border: 1px solid var(--eekos-border);
+  border-radius: 999px;
+  background: var(--eekos-surface);
+}
+
+#eekos-room-selector .eekos-pill,
+#eekos-room-selector .eekos-feature-toggle {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  color: var(--eekos-text-soft);
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1;
+  padding: 11px 16px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition:
+    background 0.22s ease,
+    color 0.22s ease,
+    transform 0.22s ease,
+    border-color 0.22s ease,
+    box-shadow 0.22s ease;
+  font-family: Arial, sans-serif;
+  min-height: 44px;
+}
+
+#eekos-room-selector .eekos-feature-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 11px 18px;
+  border: 1px solid var(--eekos-border);
+  background: #ffffff;
+  color: var(--eekos-heading);
+  font-weight: 700;
+  box-shadow: 0 4px 14px rgba(23, 54, 41, 0.06);
+}
+
+#eekos-room-selector .eekos-pill:hover,
+#eekos-room-selector .eekos-feature-toggle:hover,
+#eekos-room-selector .eekos-btn:hover {
+  transform: translateY(-1px);
+}
+
+#eekos-room-selector .eekos-feature-toggle:hover {
+  background: var(--eekos-surface);
+  border-color: var(--eekos-green);
+}
+
+#eekos-room-selector .eekos-pill.is-active,
+#eekos-room-selector .eekos-feature-toggle.is-active {
+  background: var(--eekos-green);
+  color: #ffffff;
+}
+
+#eekos-room-selector .eekos-pill:focus-visible,
+#eekos-room-selector .eekos-feature-toggle:focus-visible,
+#eekos-room-selector .eekos-btn:focus-visible,
+#eekos-room-selector .eekos-room-thumb:focus-visible,
+#eekos-room-selector .eekos-modal-close:focus-visible,
+#eekos-room-selector .eekos-field input:focus-visible,
+#eekos-room-selector .eekos-field select:focus-visible,
+#eekos-room-selector .eekos-field textarea:focus-visible {
+  outline: 2px solid rgba(31, 92, 67, 0.36);
+  outline-offset: 2px;
+}
+
+#eekos-room-selector .eekos-room-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  margin: 0 0 18px;
+  padding: 14px 0 0;
+  border-top: 1px solid var(--eekos-border-soft);
+}
+
+#eekos-room-selector .eekos-room-count {
+  color: var(--eekos-heading);
+  font-family: "Nano Sans Georgian", Georgia, serif;
+  font-size: 20px;
+  line-height: 1.1;
+  margin: 0;
+}
+
+#eekos-room-selector .eekos-room-note {
+  color: #b29d81;
+  font-size: 13px;
+  line-height: 1.5;
+  max-width: 460px;
+  text-align: left;
+  margin: 0;
+}
+
+#eekos-room-selector .eekos-room-list {
+  display: grid;
+  gap: 22px;
+}
+
+#eekos-room-selector .eekos-room-card {
+  display: grid;
+  grid-template-columns: minmax(320px, 1.08fr) minmax(320px, 0.92fr) 290px;
+  min-width: 0;
+  background: var(--eekos-card);
+  border: 1px solid var(--eekos-border);
+  border-radius: 26px;
+  overflow: hidden;
+  box-shadow: var(--eekos-shadow);
+}
+
+#eekos-room-selector .eekos-room-media {
+  position: relative;
+  min-height: 360px;
+  background: #e8ddcb;
+  overflow: hidden;
+}
+
+#eekos-room-selector .eekos-room-media img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+}
+
+#eekos-room-selector .eekos-room-thumbs {
+  position: absolute;
+  left: 16px;
+  bottom: 16px;
+  display: flex;
+  gap: 10px;
+  z-index: 2;
+  flex-wrap: wrap;
+  max-width: calc(100% - 32px);
+}
+
+#eekos-room-selector .eekos-room-thumb {
+  width: 68px;
+  height: 52px;
+  border-radius: 14px;
+  overflow: hidden;
+  border: 2px solid rgba(255, 255, 255, 0.72);
+  background: #ddd1bf;
+  cursor: pointer;
+  padding: 0;
+}
+
+#eekos-room-selector .eekos-room-thumb.is-active {
+  border-color: #ffffff;
+  box-shadow: 0 0 0 1px rgba(31, 92, 67, 0.18);
+}
+
+#eekos-room-selector .eekos-room-content {
+  padding: 38px 38px 34px;
+  border-left: 1px solid var(--eekos-border-soft);
+  min-width: 0;
+}
+
+#eekos-room-selector .eekos-room-eyebrow {
+  margin: 0 0 10px;
+  color: #6d8a73;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+#eekos-room-selector .eekos-room-title {
+  margin: 0 0 12px;
+  color: var(--eekos-heading);
+  font-family: "Nano Sans Georgian", Georgia, serif;
+  font-size: 34px;
+  line-height: 1.06;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+#eekos-room-selector .eekos-room-specs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 18px;
+  margin: 0 0 18px;
+  padding: 0;
+  list-style: none;
+}
+
+#eekos-room-selector .eekos-room-specs li {
+  color: #6f785f;
+  font-size: 15px;
+  line-height: 1.4;
+  font-weight: 500;
+}
+
+#eekos-room-selector .eekos-room-description {
+  margin: 0 0 20px;
+  color: #6f5f49;
+  font-size: 15px;
+  line-height: 1.7;
+  overflow-wrap: anywhere;
+}
+
+#eekos-room-selector .eekos-room-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 0 0 22px;
+}
+
+#eekos-room-selector .eekos-room-tag {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 38px;
+  padding: 9px 14px;
+  border: 1px solid var(--eekos-border-soft);
+  border-radius: 999px;
+  background: var(--eekos-pill);
+  color: #856747;
+  font-size: 13px;
+  line-height: 1;
+  font-weight: 500;
+  text-align: center;
+  white-space: normal;
+}
+
+#eekos-room-selector .eekos-room-details {
+  border-top: 1px solid var(--eekos-border-soft);
+  padding-top: 18px;
+}
+
+#eekos-room-selector .eekos-room-details-title {
+  margin: 0 0 12px;
+  color: var(--eekos-green);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+#eekos-room-selector .eekos-room-details-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px 16px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+#eekos-room-selector .eekos-room-details-list li {
+  color: #7c6b56;
+  font-size: 13px;
+  line-height: 1.5;
+  position: relative;
+  padding-left: 14px;
+}
+
+#eekos-room-selector .eekos-room-details-list li::before,
+#eekos-room-selector .eekos-summary-policy li::before {
+  content: "";
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--eekos-gold);
+  position: absolute;
+  top: 0.55em;
+  left: 0;
+}
+
+#eekos-room-selector .eekos-room-cta {
+  padding: 38px;
+  border-left: 1px solid var(--eekos-border-soft);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 18px;
+  min-width: 0;
+}
+
+#eekos-room-selector .eekos-room-price-label {
+  margin: 0 0 10px;
+  color: #6d8a73;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+#eekos-room-selector .eekos-room-price-panel {
+  margin: 0 0 18px;
+  padding: 18px;
+  border: 1px solid var(--eekos-border-soft);
+  border-radius: 22px;
+  background: #fffdf8;
+}
+
+#eekos-room-selector .eekos-room-price-title {
+  margin: 0 0 8px;
+  color: var(--eekos-heading);
+  font-family: "Nano Sans Georgian", Georgia, serif;
+  font-size: 24px;
+  line-height: 1.05;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+#eekos-room-selector .eekos-room-price-suffix {
+  display: block;
+  margin-top: 8px;
+  color: #6d8a73;
+  font-family: Arial, sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+#eekos-room-selector .eekos-room-price-note {
+  margin: 0 0 18px;
+  color: #b29d81;
+  font-size: 13px;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+#eekos-room-selector .eekos-room-rate-list,
+#eekos-room-selector .eekos-summary-list,
+#eekos-room-selector .eekos-summary-policy ul {
+  display: grid;
+  gap: 10px;
+}
+
+#eekos-room-selector .eekos-room-rate {
+  padding-left: 16px;
+  position: relative;
+}
+
+#eekos-room-selector .eekos-room-rate::before {
+  content: "";
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #c9d9d1;
+  position: absolute;
+  top: 0.45em;
+  left: 0;
+}
+
+#eekos-room-selector .eekos-room-rate strong {
+  display: block;
+  color: var(--eekos-heading);
+  font-size: 14px;
+  line-height: 1.4;
+  font-weight: 700;
+}
+
+#eekos-room-selector .eekos-room-rate span {
+  display: block;
+  color: #7b6d5a;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+#eekos-room-selector .eekos-room-actions {
+  display: grid;
+  gap: 12px;
+  margin-top: auto;
+}
+
+#eekos-room-selector .eekos-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: auto;
+  min-width: 0;
+  min-height: 56px;
+  padding: 14px 18px;
+  border-radius: 999px;
+  text-decoration: none;
+  text-align: center;
+  transition:
+    transform 0.2s ease,
+    background 0.2s ease,
+    color 0.2s ease,
+    border-color 0.2s ease;
+  font-family: Arial, sans-serif;
+  cursor: pointer;
+  white-space: normal;
+}
+
+#eekos-room-selector .eekos-btn--primary {
+  background: var(--eekos-green);
+  border: 1px solid var(--eekos-green);
+  color: #ffffff;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+#eekos-room-selector .eekos-btn--primary:hover {
+  background: var(--eekos-green-dark);
+  border-color: var(--eekos-green-dark);
+}
+
+#eekos-room-selector .eekos-btn--secondary {
+  background: transparent;
+  border: 1px solid var(--eekos-border);
+  color: var(--eekos-heading);
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+#eekos-room-selector .eekos-btn--ghost,
+#eekos-room-selector .eekos-modal-close {
+  background: #ffffff;
+  border: 1px solid var(--eekos-border);
+  color: var(--eekos-heading);
+}
+
+#eekos-room-selector .eekos-btn--ghost {
+  font-size: 14px;
+  font-weight: 700;
+}
+
+#eekos-room-selector .eekos-btn.is-disabled,
+#eekos-room-selector .eekos-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.62;
+  transform: none;
+  box-shadow: none;
+}
+
+#eekos-room-selector .eekos-empty {
+  padding: 36px 28px;
+  border: 1px dashed var(--eekos-border);
+  border-radius: 22px;
+  background: var(--eekos-card);
+  color: var(--eekos-text-soft);
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+#eekos-room-selector .eekos-summary-row strong,
+#eekos-room-selector .eekos-room-count,
+#eekos-room-selector .eekos-room-note {
+  overflow-wrap: anywhere;
+}
+
+
+
+#eekos-room-selector [hidden] {
+  display: none;
+}
+
+#eekos-room-selector .eekos-booking-modal[hidden] {
+  display: none;
+}
+
+#eekos-room-selector .eekos-booking-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 999999;
+  background: var(--eekos-overlay);
+  padding: 24px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+#eekos-room-selector .eekos-booking-dialog {
+  width: 100%;
+  max-width: 1180px;
+  min-height: min(760px, calc(100dvh - 48px));
+  margin: 30px auto;
+  background: #f7f2ea;
+  border-radius: 28px;
+  overflow: hidden;
+  box-shadow: 0 24px 64px rgba(9, 15, 11, 0.25);
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) 360px;
+}
+
+#eekos-room-selector .eekos-booking-main {
+  padding: 34px 34px 30px;
+  min-width: 0;
+}
+
+#eekos-room-selector .eekos-booking-side {
+  background: #f2ece2;
+  border-left: 1px solid var(--eekos-border-soft);
+  padding: 34px 28px 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  min-width: 0;
+}
+
+#eekos-room-selector .eekos-booking-top {
+  display: flex;
+  justify-content: space-between;
+  gap: 18px;
+  align-items: flex-start;
+  margin-bottom: 22px;
+}
+
+#eekos-room-selector .eekos-booking-kicker {
+  margin: 0 0 8px;
+  color: #6d8a73;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+#eekos-room-selector .eekos-booking-kicker--compact {
+  margin-bottom: 8px;
+}
+
+#eekos-room-selector .eekos-booking-title,
+#eekos-room-selector .eekos-confirmation-title {
+  color: var(--eekos-heading);
+  font-family: "Nano Sans Georgian", Georgia, serif;
+  font-weight: 700;
+}
+
+#eekos-room-selector .eekos-booking-title {
+  margin: 0;
+  font-size: 34px;
+  line-height: 1.06;
+}
+
+#eekos-room-selector .eekos-modal-close {
+  appearance: none;
+  min-width: 44px;
+  width: 44px;
+  height: 44px;
+  border-radius: 999px;
+  cursor: pointer;
+  font-size: 20px;
+  line-height: 1;
+}
+
+#eekos-room-selector .eekos-stepper {
+  display: flex;
+  gap: 10px;
+  flex-wrap: nowrap;
+  margin: 0 0 16px;
+  padding-bottom: 4px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+#eekos-room-selector .eekos-stepper::-webkit-scrollbar {
+  display: none;
+}
+
+#eekos-room-selector .eekos-step {
+  min-height: 40px;
+  padding: 10px 14px;
+  border-radius: 999px;
+  background: #ece4d7;
+  color: #8a6a43;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+}
+
+#eekos-room-selector .eekos-step.is-active {
+  background: var(--eekos-green);
+  color: #ffffff;
+}
+
+#eekos-room-selector .eekos-form-feedback {
+  min-height: 22px;
+  margin: 0 0 18px;
+  padding-left: 14px;
+  border-left: 3px solid rgba(145, 75, 50, 0.26);
+  color: #914b32;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+#eekos-room-selector .eekos-form-feedback:empty {
+  display: none;
+}
+
+#eekos-room-selector .eekos-step-pane {
+  display: none;
+}
+
+#eekos-room-selector .eekos-step-pane.is-active,
+#eekos-room-selector .eekos-confirmation.is-active {
+  display: block;
+}
+
+#eekos-room-selector .eekos-section-label {
+  margin: 0 0 14px;
+  color: var(--eekos-heading);
+  font-family: "Nano Sans Georgian", Georgia, serif;
+  font-size: 22px;
+  line-height: 1.2;
+  font-weight: 700;
+}
+
+#eekos-room-selector .eekos-section-copy {
+  margin: 0 0 18px;
+  color: #7b6d5a;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+#eekos-room-selector .eekos-field-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  margin-bottom: 18px;
+}
+
+#eekos-room-selector .eekos-field {
+  display: grid;
+  gap: 8px;
+}
+
+#eekos-room-selector .eekos-field.eekos-field--full {
+  grid-column: 1 / -1;
+}
+
+#eekos-room-selector .eekos-field label,
+#eekos-room-selector .eekos-summary-rate,
+#eekos-room-selector .eekos-confirmation-ref {
+  color: #6d8a73;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+#eekos-room-selector .eekos-field input,
+#eekos-room-selector .eekos-field select,
+#eekos-room-selector .eekos-field textarea {
+  width: 100%;
+  min-height: 52px;
+  border: 1px solid var(--eekos-border);
+  border-radius: 16px;
+  background: #ffffff;
+  padding: 14px 16px;
+  color: var(--eekos-heading);
+  font-family: Arial, sans-serif;
+  font-size: 15px;
+  outline: none;
+}
+
+#eekos-room-selector .eekos-field input[aria-invalid="true"],
+#eekos-room-selector .eekos-field select[aria-invalid="true"],
+#eekos-room-selector .eekos-field textarea[aria-invalid="true"] {
+  border-color: rgba(145, 75, 50, 0.72);
+  box-shadow: 0 0 0 4px rgba(145, 75, 50, 0.1);
+}
+
+#eekos-room-selector .eekos-field textarea {
+  min-height: 112px;
+  resize: vertical;
+}
+
+#eekos-room-selector .eekos-field input:focus,
+#eekos-room-selector .eekos-field select:focus,
+#eekos-room-selector .eekos-field textarea:focus {
+  border-color: rgba(31, 92, 67, 0.5);
+  box-shadow: 0 0 0 4px rgba(31, 92, 67, 0.08);
+}
+
+#eekos-room-selector .eekos-micro,
+#eekos-room-selector .eekos-payment-copy,
+#eekos-room-selector .eekos-summary-policy li,
+#eekos-room-selector .eekos-confirmation-text {
+  color: #7b6d5a;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+#eekos-room-selector .eekos-micro {
+  margin: 0;
+}
+
+#eekos-room-selector .eekos-form-actions {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 10px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+#eekos-room-selector .eekos-form-actions--spacious {
+  margin-top: 18px;
+}
+
+#eekos-room-selector .eekos-summary-card,
+#eekos-room-selector .eekos-summary-payment,
+#eekos-room-selector .eekos-summary-policy {
+  background: #f7f2ea;
+  border: 1px solid var(--eekos-border-soft);
+  border-radius: 22px;
+  padding: 18px;
+}
+
+#eekos-room-selector .eekos-summary-payment--step {
+  margin-bottom: 18px;
+}
+
+#eekos-room-selector .eekos-pricing-review {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr);
+  gap: 16px;
+}
+
+#eekos-room-selector .eekos-review-points {
+  display: grid;
+  gap: 12px;
+}
+
+#eekos-room-selector .eekos-review-point {
+  padding: 16px 18px;
+  border: 1px solid var(--eekos-border-soft);
+  border-radius: 20px;
+  background: #fffdf8;
+}
+
+#eekos-room-selector .eekos-review-point strong {
+  display: block;
+  margin-bottom: 6px;
+  color: var(--eekos-heading);
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+#eekos-room-selector .eekos-review-point span {
+  display: block;
+  color: #7b6d5a;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+#eekos-room-selector .eekos-summary-title,
+#eekos-room-selector .eekos-summary-room-name {
+  color: var(--eekos-heading);
+  font-family: "Nano Sans Georgian", Georgia, serif;
+  font-weight: 700;
+}
+
+#eekos-room-selector .eekos-summary-title {
+  margin: 0 0 12px;
+  font-size: 20px;
+  line-height: 1.15;
+}
+
+#eekos-room-selector .eekos-summary-highlight {
+  margin: 0 0 8px;
+  color: var(--eekos-heading);
+  font-family: "Nano Sans Georgian", Georgia, serif;
+  font-size: 24px;
+  line-height: 1.15;
+  font-weight: 700;
+  max-width: 18ch;
+}
+
+#eekos-room-selector .eekos-summary-copy {
+  margin: 0 0 14px;
+  color: #7b6d5a;
+  font-size: 13px;
+  line-height: 1.6;
+  max-width: 28ch;
+}
+
+#eekos-room-selector .eekos-summary-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  color: #7b6d5a;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+#eekos-room-selector .eekos-summary-row strong,
+#eekos-room-selector .eekos-summary-room-name {
+  color: var(--eekos-heading);
+}
+
+#eekos-room-selector .eekos-summary-row strong {
+  text-align: right;
+}
+
+#eekos-room-selector .eekos-summary-room-name {
+  margin: 0 0 8px;
+  font-size: 24px;
+  line-height: 1.1;
+}
+
+#eekos-room-selector .eekos-summary-rate {
+  margin: 0 0 12px;
+}
+
+#eekos-room-selector .eekos-payment-amount {
+  margin: 0 0 8px;
+  color: var(--eekos-heading);
+  font-family: "Nano Sans Georgian", Georgia, serif;
+  font-size: 30px;
+  line-height: 1.05;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+#eekos-room-selector .eekos-summary-policy ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+#eekos-room-selector .eekos-summary-policy li {
+  position: relative;
+  padding-left: 14px;
+}
+
+#eekos-room-selector .eekos-confirmation {
+  display: none;
+  padding: 4px 0 0;
+}
+
+#eekos-room-selector .eekos-confirmation-card {
+  border: 1px solid var(--eekos-border-soft);
+  background: #ffffff;
+  border-radius: 24px;
+  padding: 22px;
+}
+
+#eekos-room-selector .eekos-confirmation-title {
+  margin: 0 0 12px;
+  font-size: 28px;
+  line-height: 1.1;
+}
+
+#eekos-room-selector .eekos-confirmation-text {
+  margin: 0 0 18px;
+}
+
+#eekos-room-selector .eekos-confirmation-ref {
+  margin-bottom: 10px;
+}
+
+#eekos-room-selector .eekos-hidden {
+  display: none;
+}
+
+#eekos-room-selector .eekos-micro.is-warning {
+  color: #8a4b34;
+}
+
+
+
+@media (max-width: 1200px) {
+  #eekos-room-selector .eekos-room-card,
+  #eekos-room-selector .eekos-booking-dialog {
+    grid-template-columns: 1fr;
+  }
+
+  #eekos-room-selector .eekos-room-content,
+  #eekos-room-selector .eekos-room-cta,
+  #eekos-room-selector .eekos-booking-side {
+    border-left: 0;
+    border-top: 1px solid var(--eekos-border-soft);
+  }
+
+  #eekos-room-selector .eekos-room-cta {
+    padding-top: 28px;
+  }
+}
+
+@media (max-width: 991px) {
+  #eekos-room-selector .eekos-room-toolbar {
+    align-items: flex-start;
+  }
+
+  #eekos-room-selector .eekos-toolbar-label {
+    width: 100%;
+    margin-right: 0;
+  }
+
+  #eekos-room-selector .eekos-room-content,
+  #eekos-room-selector .eekos-room-cta {
+    padding: 28px 24px;
+  }
+
+  #eekos-room-selector .eekos-room-actions .eekos-btn {
+    width: 100%;
+  }
+
+  #eekos-room-selector .eekos-booking-side {
+    gap: 14px;
+  }
+
+  #eekos-room-selector .eekos-pricing-review {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 767px) {
+  #eekos-room-selector .eekos-room-toolbar {
+    gap: 10px;
+  }
+
+  #eekos-room-selector .eekos-toolbar-label {
+    font-size: 11px;
+  }
+
+  #eekos-room-selector .eekos-pill-group {
+    width: 100%;
+    gap: 6px;
+    padding: 5px;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  #eekos-room-selector .eekos-pill-group::-webkit-scrollbar {
+    display: none;
+  }
+
+  #eekos-room-selector .eekos-pill,
+  #eekos-room-selector .eekos-feature-toggle {
+    font-size: 13px;
+    padding: 10px 14px;
+    min-height: 44px;
+    flex: 0 0 auto;
+  }
+
+  #eekos-room-selector .eekos-feature-toggle {
+    width: 100%;
+  }
+
+  #eekos-room-selector .eekos-room-meta {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  #eekos-room-selector .eekos-room-count {
+    font-size: 18px;
+  }
+
+  #eekos-room-selector .eekos-room-note {
+    text-align: left;
+    font-size: 12px;
+    line-height: 1.55;
+  }
+
+  #eekos-room-selector .eekos-room-title,
+  #eekos-room-selector .eekos-booking-title {
+    font-size: 28px;
+  }
+
+  #eekos-room-selector .eekos-room-eyebrow {
+    font-size: 11px;
+  }
+
+  #eekos-room-selector .eekos-room-specs li,
+  #eekos-room-selector .eekos-room-description,
+  #eekos-room-selector .eekos-section-copy {
+    font-size: 14px;
+  }
+
+  #eekos-room-selector .eekos-room-description,
+  #eekos-room-selector .eekos-section-copy,
+  #eekos-room-selector .eekos-confirmation-text {
+    line-height: 1.6;
+  }
+
+  #eekos-room-selector .eekos-room-tag {
+    font-size: 12px;
+    min-height: 34px;
+    padding: 8px 12px;
+  }
+
+  #eekos-room-selector .eekos-room-details-title,
+  #eekos-room-selector .eekos-room-price-label {
+    font-size: 12px;
+  }
+
+  #eekos-room-selector .eekos-room-details-list li {
+    font-size: 12px;
+    line-height: 1.5;
+  }
+
+  #eekos-room-selector .eekos-room-price-title {
+    font-size: 22px;
+  }
+
+  #eekos-room-selector .eekos-room-price-suffix {
+    font-size: 11px;
+  }
+
+  #eekos-room-selector .eekos-room-price-panel {
+    padding: 16px;
+  }
+
+  #eekos-room-selector .eekos-room-price-note {
+    font-size: 12px;
+    line-height: 1.55;
+  }
+
+  #eekos-room-selector .eekos-room-rate strong,
+  #eekos-room-selector .eekos-btn--primary,
+  #eekos-room-selector .eekos-btn--secondary,
+  #eekos-room-selector .eekos-btn--ghost {
+    font-size: 13px;
+  }
+
+  #eekos-room-selector .eekos-room-rate span,
+  #eekos-room-selector .eekos-summary-row {
+    font-size: 12px;
+    line-height: 1.5;
+  }
+
+  #eekos-room-selector .eekos-room-content,
+  #eekos-room-selector .eekos-room-cta {
+    padding: 24px 22px;
+  }
+
+  #eekos-room-selector .eekos-room-media {
+    min-height: 280px;
+  }
+
+  #eekos-room-selector .eekos-room-details-list,
+  #eekos-room-selector .eekos-field-grid {
+    grid-template-columns: 1fr;
+  }
+
+  #eekos-room-selector .eekos-room-thumbs {
+    left: 12px;
+    bottom: 12px;
+    gap: 8px;
+  }
+
+  #eekos-room-selector .eekos-room-thumb {
+    width: 58px;
+    height: 46px;
+    border-radius: 12px;
+  }
+
+  #eekos-room-selector .eekos-booking-modal {
+    padding: 0;
+  }
+
+  #eekos-room-selector .eekos-booking-dialog {
+    min-height: 100dvh;
+    margin: 0;
+    border-radius: 0;
+  }
+
+  #eekos-room-selector .eekos-booking-main {
+    padding: 20px 16px 28px;
+  }
+
+  #eekos-room-selector .eekos-booking-side {
+    padding: 18px 16px calc(18px + env(safe-area-inset-bottom, 0px));
+  }
+
+  #eekos-room-selector .eekos-booking-top {
+    position: sticky;
+    top: 0;
+    z-index: 4;
+    background: #f7f2ea;
+    padding-bottom: 12px;
+    margin-bottom: 18px;
+  }
+
+  #eekos-room-selector .eekos-booking-kicker,
+  #eekos-room-selector .eekos-step,
+  #eekos-room-selector .eekos-field label,
+  #eekos-room-selector .eekos-summary-rate,
+  #eekos-room-selector .eekos-confirmation-ref,
+  #eekos-room-selector .eekos-micro {
+    font-size: 11px;
+  }
+
+  #eekos-room-selector .eekos-section-label,
+  #eekos-room-selector .eekos-summary-title {
+    font-size: 20px;
+  }
+
+  #eekos-room-selector .eekos-summary-highlight {
+    font-size: 22px;
+  }
+
+  #eekos-room-selector .eekos-field input,
+  #eekos-room-selector .eekos-field select,
+  #eekos-room-selector .eekos-field textarea {
+    font-size: 14px;
+  }
+
+  #eekos-room-selector .eekos-summary-room-name {
+    font-size: 22px;
+  }
+
+  #eekos-room-selector .eekos-payment-amount {
+    font-size: 26px;
+  }
+
+  #eekos-room-selector .eekos-review-point {
+    padding: 14px 16px;
+  }
+
+  #eekos-room-selector .eekos-payment-copy,
+  #eekos-room-selector .eekos-summary-policy li,
+  #eekos-room-selector .eekos-confirmation-text {
+    font-size: 12px;
+  }
+
+  #eekos-room-selector .eekos-confirmation-title {
+    font-size: 24px;
+  }
+
+  #eekos-room-selector .eekos-form-actions {
+    flex-direction: column-reverse;
+    align-items: stretch;
+    padding-top: 14px;
+    border-top: 1px solid var(--eekos-border-soft);
+  }
+
+  #eekos-room-selector .eekos-form-actions .eekos-btn {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  #eekos-room-selector .eekos-room-list {
+    gap: 18px;
+  }
+
+  #eekos-room-selector .eekos-room-card {
+    border-radius: 22px;
+  }
+
+  #eekos-room-selector .eekos-room-title,
+  #eekos-room-selector .eekos-booking-title {
+    font-size: 24px;
+  }
+
+  #eekos-room-selector .eekos-summary-highlight {
+    font-size: 20px;
+  }
+
+  #eekos-room-selector .eekos-review-point strong,
+  #eekos-room-selector .eekos-review-point span {
+    font-size: 12px;
+  }
+
+  #eekos-room-selector .eekos-room-content,
+  #eekos-room-selector .eekos-room-cta {
+    padding: 20px 18px;
+  }
+
+  #eekos-room-selector .eekos-room-media {
+    min-height: 240px;
+  }
+
+  #eekos-room-selector .eekos-room-thumb {
+    width: 54px;
+    height: 42px;
+  }
+
+  #eekos-room-selector .eekos-booking-main,
+  #eekos-room-selector .eekos-booking-side {
+    padding-left: 14px;
+    padding-right: 14px;
+  }
+
+  #eekos-room-selector .eekos-summary-row {
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  #eekos-room-selector .eekos-summary-row strong {
+    text-align: left;
+  }
+}
+</style>
+
+<section id="eekos-room-selector" aria-label="EEKOS room selection">
+  <div class="eekos-room-shell">
+    <div class="eekos-room-toolbar">
+      <span class="eekos-toolbar-label">Guests</span>
+      <div class="eekos-pill-group" data-group="guests">
+        <button type="button" class="eekos-pill is-active" data-guests="all">All</button>
+        <button type="button" class="eekos-pill" data-guests="1-2">1-2</button>
+        <button type="button" class="eekos-pill" data-guests="3-4">3-4</button>
+        <button type="button" class="eekos-pill" data-guests="5+">5+</button>
+      </div>
+
+      <span class="eekos-toolbar-label">Sort</span>
+      <div class="eekos-pill-group" data-group="sort">
+        <button type="button" class="eekos-pill is-active" data-sort="default">Featured</button>
+        <button type="button" class="eekos-pill" data-sort="size">Size</button>
+      </div>
+
+      <button type="button" class="eekos-feature-toggle" data-feature="balcony">Balcony</button>
+    </div>
+
+    <div class="eekos-room-meta">
+      <p class="eekos-room-count" id="eekos-room-count">7 rooms available</p>
+      <p class="eekos-room-note" id="eekos-room-note">
+        Choose a room, select your dates, and review pricing before you continue to checkout.
+      </p>
+    </div>
+
+    <div class="eekos-room-list" id="eekos-room-list"></div>
+  </div>
+
+  <div class="eekos-booking-modal" id="eekos-booking-modal" hidden>
+    <div class="eekos-booking-dialog" role="dialog" aria-modal="true" aria-labelledby="eekos-booking-title">
+      <div class="eekos-booking-main">
+        <div class="eekos-booking-top">
+          <div>
+            <p class="eekos-booking-kicker">Secure your stay</p>
+            <h2 class="eekos-booking-title" id="eekos-booking-title">Reserve your stay</h2>
+          </div>
+          <button type="button" class="eekos-modal-close" id="eekos-modal-close" aria-label="Close booking modal">&times;</button>
+        </div>
+
+        <div class="eekos-stepper" aria-label="Booking steps">
+          <div class="eekos-step is-active" data-step-indicator="1">Stay</div>
+          <div class="eekos-step" data-step-indicator="2">Pricing</div>
+          <div class="eekos-step" data-step-indicator="3">Guest</div>
+        </div>
+
+        <p class="eekos-form-feedback" id="eekos-form-feedback" role="alert" aria-live="polite"></p>
+
+        <form id="eekos-booking-form" novalidate>
+          <div class="eekos-step-pane is-active" data-step-pane="1">
+            <h3 class="eekos-section-label">Choose your stay</h3>
+            <p class="eekos-section-copy">Select your dates and guest count first so you can review pricing before checkout.</p>
+
+            <div class="eekos-field-grid">
+              <div class="eekos-field">
+                <label for="eekos-checkin">Check-in</label>
+                <input type="date" id="eekos-checkin" name="checkin" required>
+              </div>
+
+              <div class="eekos-field">
+                <label for="eekos-checkout">Check-out</label>
+                <input type="date" id="eekos-checkout" name="checkout" required>
+              </div>
+
+              <div class="eekos-field">
+                <label for="eekos-adults">Adults</label>
+                <select id="eekos-adults" name="adults" required>
+                  <option value="1">1 adult</option>
+                  <option value="2" selected>2 adults</option>
+                  <option value="3">3 adults</option>
+                  <option value="4">4 adults</option>
+                  <option value="5">5 adults</option>
+                  <option value="6">6 adults</option>
+                </select>
+              </div>
+
+              <div class="eekos-field">
+                <label for="eekos-children">Children</label>
+                <select id="eekos-children" name="children">
+                  <option value="0" selected>0 children</option>
+                  <option value="1">1 child</option>
+                  <option value="2">2 children</option>
+                  <option value="3">3 children</option>
+                  <option value="4">4 children</option>
+                </select>
+              </div>
+
+              <div class="eekos-field eekos-field--full">
+                <label for="eekos-special-requests">Special requests</label>
+                <textarea
+                  id="eekos-special-requests"
+                  name="special_requests"
+                  maxlength="500"
+                  placeholder="Arrival time, bed preference, accessibility notes, or any special request."
+                ></textarea>
+              </div>
+            </div>
+
+            <div class="eekos-form-actions">
+              <span></span>
+              <button type="button" class="eekos-btn eekos-btn--primary" data-next-step="2">Review pricing</button>
+            </div>
+          </div>
+
+          <div class="eekos-step-pane" data-step-pane="2">
+            <h3 class="eekos-section-label" id="eekos-payment-step-title" tabindex="-1">Review pricing</h3>
+            <p class="eekos-section-copy" id="eekos-payment-step-copy">Review the pricing path for this stay. The exact amount is shown before payment on the secure checkout page.</p>
+
+            <div class="eekos-pricing-review">
+              <div class="eekos-summary-payment eekos-summary-payment--step">
+                <p class="eekos-booking-kicker eekos-booking-kicker--compact" id="eekos-payment-state-kicker">Starting rate</p>
+                <p class="eekos-payment-amount" id="eekos-payment-amount">Starting rate shown below</p>
+                <p class="eekos-payment-copy" id="eekos-payment-copy">
+                  Starting rates help guests compare rooms first. The final amount and any deposit request are shown before payment.
+                </p>
+              </div>
+
+              <div class="eekos-review-points" aria-label="What happens next">
+                <div class="eekos-review-point">
+                  <strong>Before payment</strong>
+                  <span>The final amount and any deposit request are shown before payment is completed.</span>
+                </div>
+                <div class="eekos-review-point">
+                  <strong>Reservation policy</strong>
+                  <span>Your room is confirmed once payment is completed.</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="eekos-form-actions eekos-form-actions--spacious">
+              <button type="button" class="eekos-btn eekos-btn--ghost" data-prev-step="1">Back</button>
+              <button type="button" class="eekos-btn eekos-btn--primary" data-next-step="3">Continue with guest details</button>
+            </div>
+          </div>
+
+          <div class="eekos-step-pane" data-step-pane="3">
+            <h3 class="eekos-section-label">Guest details</h3>
+            <p class="eekos-section-copy">Add guest details so EEKOS can send checkout and reservation updates for your stay.</p>
+
+            <div class="eekos-field-grid">
+              <div class="eekos-field">
+                <label for="eekos-full-name">Full name</label>
+                <input type="text" id="eekos-full-name" name="full_name" autocomplete="name" autocapitalize="words" maxlength="120" required>
+              </div>
+
+              <div class="eekos-field">
+                <label for="eekos-email">Email address</label>
+                <input type="email" id="eekos-email" name="email" autocomplete="email" inputmode="email" maxlength="160" required>
+              </div>
+
+              <div class="eekos-field">
+                <label for="eekos-phone">Phone number</label>
+                <input type="tel" id="eekos-phone" name="phone" autocomplete="tel" inputmode="tel" maxlength="32" required>
+              </div>
+
+              <div class="eekos-field">
+                <label for="eekos-arrival-time">Estimated arrival time</label>
+                <input type="text" id="eekos-arrival-time" name="arrival_time" maxlength="40" placeholder="Example: 3:00 PM">
+              </div>
+            </div>
+
+            <p class="eekos-micro" id="eekos-payment-note">
+              Best practice: do not collect raw card details inside a custom HTML block. Send the guest to your real GHL payment page, booking engine, or hosted checkout.
+            </p>
+
+            <div class="eekos-form-actions eekos-form-actions--spacious">
+              <button type="button" class="eekos-btn eekos-btn--ghost" data-prev-step="2">Back</button>
+              <button
+                type="submit"
+                class="eekos-btn eekos-btn--primary"
+                id="eekos-submit-booking"
+                aria-describedby="eekos-payment-note"
+              >
+                Continue to secure checkout
+              </button>
+            </div>
+          </div>
+        </form>
+
+        <div class="eekos-confirmation" id="eekos-confirmation">
+          <div class="eekos-confirmation-card">
+            <div class="eekos-confirmation-ref" id="eekos-confirmation-ref">Booking reference</div>
+            <h3 class="eekos-confirmation-title">Almost there</h3>
+            <p class="eekos-confirmation-text" id="eekos-confirmation-text">
+              You are being sent to the secure checkout page, where the final amount and any deposit request can be confirmed for this stay.
+            </p>
+            <button type="button" class="eekos-btn eekos-btn--primary" id="eekos-close-confirmation">Done</button>
+          </div>
+        </div>
+      </div>
+
+      <aside class="eekos-booking-side">
+        <div class="eekos-summary-card">
+          <p class="eekos-summary-rate">Your stay</p>
+          <h3 class="eekos-summary-room-name" id="eekos-summary-room-name">Room</h3>
+
+          <div class="eekos-summary-list">
+            <div class="eekos-summary-row">
+              <span>Guests</span>
+              <strong id="eekos-summary-guests">2 adults</strong>
+            </div>
+            <div class="eekos-summary-row">
+              <span>Stay dates</span>
+              <strong id="eekos-summary-dates">Select dates</strong>
+            </div>
+            <div class="eekos-summary-row">
+              <span>Nights</span>
+              <strong id="eekos-summary-nights">-</strong>
+            </div>
+            <div class="eekos-summary-row">
+              <span>Room size</span>
+              <strong id="eekos-summary-size">-</strong>
+            </div>
+            <div class="eekos-summary-row">
+              <span>Bed setup</span>
+              <strong id="eekos-summary-bed">-</strong>
+            </div>
+          </div>
+        </div>
+
+        <div class="eekos-summary-payment">
+          <p class="eekos-summary-title" id="eekos-summary-card-title">Price &amp; policy</p>
+          <p class="eekos-summary-highlight" id="eekos-summary-rate-state">See your final amount before checkout</p>
+          <p class="eekos-summary-copy" id="eekos-summary-rate-copy">
+            The starting rate below helps guests compare rooms. Secure checkout shows the final amount, any deposit request, and the room plan before payment.
+          </p>
+          <div class="eekos-summary-list">
+            <div class="eekos-summary-row">
+              <span id="eekos-summary-rate-label">Starting rate</span>
+              <strong id="eekos-summary-rate-preview">Starting rate shown below</strong>
+            </div>
+            <div class="eekos-summary-row" id="eekos-summary-total-row" hidden>
+              <span>Estimated total</span>
+              <strong id="eekos-summary-total">-</strong>
+            </div>
+            <div class="eekos-summary-row" id="eekos-summary-deposit-row" hidden>
+              <span>Deposit due now</span>
+              <strong id="eekos-summary-deposit">-</strong>
+            </div>
+            <div class="eekos-summary-row" id="eekos-summary-balance-row" hidden>
+              <span>Balance at property</span>
+              <strong id="eekos-summary-balance">-</strong>
+            </div>
+          </div>
+        </div>
+
+        <div class="eekos-summary-policy">
+          <p class="eekos-summary-title">Stay notes</p>
+          <ul>
+            <li>Starting rates may change based on your dates, taxes, and selected room plan.</li>
+            <li>The final amount is shown before the guest chooses how to pay.</li>
+            <li>Your room is confirmed once payment is completed.</li>
+          </ul>
+        </div>
+      </aside>
+    </div>
+  </div>
+</section>
+
+<script>
+(function () {
+
+const PAYMENT_URL_PLACEHOLDER = "YOUR_GHL_PAYMENT_LINK_OR_ORDER_FORM_URL_HERE";
+const PAYMENT_CONFIG = {
+  paymentUrl: PAYMENT_URL_PLACEHOLDER,
+  depositType: "percentage",
+  depositValue: 30,
+  currency: "PHP",
+  openInNewTab: true
+};
+const INQUIRE_URL = "#inquire";
+const BOOKING_UI_TEXT = {
+  paymentReadyButtonLabel: "Continue to secure checkout",
+  paymentMissingButtonLabel: "Checkout unavailable",
+  paymentReadyNote:
+    "You will review the final amount and any deposit request on the secure checkout page before payment is completed.",
+  paymentMissingNote:
+    "Set a real hosted payment URL in the config before launch. Until then, this step should be treated as preview-only and must not be used as a live checkout.",
+  paymentReadyConfirmation:
+    "You are being sent to the secure checkout page to review the final amount and complete your reservation.",
+  paymentMissingConfirmation:
+    "A live payment handoff is not configured yet. This preview can collect booking details for review, but it should not be presented as a confirmed reservation or a real payment flow."
+};
+const ROOM_PRICING_TEXT = {
+  roomGuideNote:
+    "Choose a room, select your dates, and review pricing before you continue to checkout.",
+  roomGuideLiveNote:
+    "Choose your dates to review the estimated stay total before you continue to checkout.",
+  cardPriceLabel: "From",
+  cardFallbackLabel: "Best available rate",
+  cardRateUnavailable: "Inquire for direct pricing",
+  cardLiveRateNote:
+    "Choose your dates to review the estimated stay total before checkout.",
+  cardRateNote:
+    "Choose your dates to review pricing before checkout.",
+  cardStayNotes: [
+    {
+      title: "Review pricing first",
+      body: "Guests see the final amount before choosing how to pay."
+    },
+    {
+      title: "Reservation policy",
+      body: "Rooms are confirmed once payment is completed."
+    }
+  ],
+  summaryReferenceRateLabel: "Starting rate",
+  summaryReferenceTitle: "Price & policy",
+  summaryReferenceStateReady: "See your final amount before checkout",
+  summaryReferenceStateMissing: "EEKOS will confirm the final amount after review",
+  summaryReferenceCardCopyReady:
+    "The starting rate below helps guests compare rooms. Secure checkout shows the final amount, any deposit request, and the room plan before payment.",
+  summaryReferenceCardCopyMissing:
+    "The starting rate below helps guests compare rooms. Final pricing and any deposit request should be confirmed manually until live checkout is configured.",
+  summaryReferenceAmountReady: "Starting rate shown below",
+  summaryReferenceAmountMissing: "Final amount shared after review",
+  summaryReferenceCopyReady:
+    "The starting rate helps guests compare rooms first. The final amount, any deposit request, and cancellation terms are shown before payment.",
+  summaryReferenceCopyMissing:
+    "The room card shows a starting rate only. Final room rate and any deposit request should be confirmed manually until a live payment handoff is configured.",
+  summaryLiveTitle: "Price & policy",
+  summaryLiveState: "Estimated total for selected dates",
+  summaryLiveCardCopy:
+    "This estimate uses your direct room rate setup. Guests should still see the exact amount and any deposit due before they choose how to pay.",
+  summaryLiveAmount: "Estimated total",
+  paymentStepTitleReferenceReady: "Review pricing",
+  paymentStepTitleReferenceMissing: "Review your booking request",
+  paymentStepCopyReferenceReady:
+    "Review the pricing path for this stay. The exact amount is shown before payment on the secure checkout page.",
+  paymentStepCopyReferenceMissing:
+    "Review the stay details below. Final pricing and any deposit request should be confirmed manually until live checkout is configured.",
+  paymentStepTitleLive: "Review pricing",
+  paymentStepCopyLive:
+    "Review the estimated total below before continuing to secure checkout, where the final amount is shown again before payment.",
+  paymentStateKickerReferenceReady: "Starting rate",
+  paymentStateKickerReferenceMissing: "Reservation review",
+  paymentStateKickerLive: "Estimated total"
+};
+
+const IMG = {
+  img01: "https://assets.cdn.filesafe.space/tofqffUfOD2z8r3qU7nZ/media/69c3a198c14403596a2f9180.jpg",
+  img02: "https://assets.cdn.filesafe.space/tofqffUfOD2z8r3qU7nZ/media/69c3a1988e26a12304644643.jpg",
+  img03: "https://assets.cdn.filesafe.space/tofqffUfOD2z8r3qU7nZ/media/69c3a198c144033ee32f917e.jpg",
+  img04: "https://assets.cdn.filesafe.space/tofqffUfOD2z8r3qU7nZ/media/69c3a198c1440369fe2f918d.jpg",
+  img05: "https://assets.cdn.filesafe.space/tofqffUfOD2z8r3qU7nZ/media/69c3a19805117bc5b7411b15.jpg",
+  img06: "https://assets.cdn.filesafe.space/tofqffUfOD2z8r3qU7nZ/media/69c3a198bedf5af2ccde6dd4.jpg",
+  img07: "https://assets.cdn.filesafe.space/tofqffUfOD2z8r3qU7nZ/media/69c3a19805117b81c3411b09.jpg",
+  img08: "https://assets.cdn.filesafe.space/tofqffUfOD2z8r3qU7nZ/media/69c3a198bedf5aafd4de6de5.jpg",
+  img09: "https://assets.cdn.filesafe.space/tofqffUfOD2z8r3qU7nZ/media/69c3a198bedf5a2f39de6de7.jpg",
+  img10: "https://assets.cdn.filesafe.space/tofqffUfOD2z8r3qU7nZ/media/69c3a19805117b89dd411b0c.jpg",
+  img11: "https://assets.cdn.filesafe.space/tofqffUfOD2z8r3qU7nZ/media/69c3a198bedf5a238bde6dd2.jpg",
+  img12: "https://assets.cdn.filesafe.space/tofqffUfOD2z8r3qU7nZ/media/69c3a1988e26a187c8644653.jpg",
+  img13: "https://assets.cdn.filesafe.space/tofqffUfOD2z8r3qU7nZ/media/69c3a198bedf5aa46cde6dd5.jpg",
+  img14: "https://assets.cdn.filesafe.space/tofqffUfOD2z8r3qU7nZ/media/69c3a1988e26a1303e644648.jpg",
+  img15: "https://assets.cdn.filesafe.space/tofqffUfOD2z8r3qU7nZ/media/69c3a198c1440376ca2f918e.jpg",
+  img16: "https://assets.cdn.filesafe.space/tofqffUfOD2z8r3qU7nZ/media/69c3a19836226c8482e70a8b.jpg",
+  img17: "https://assets.cdn.filesafe.space/tofqffUfOD2z8r3qU7nZ/media/69c3a198bedf5a2e46de6dce.jpg",
+  img18: "https://assets.cdn.filesafe.space/tofqffUfOD2z8r3qU7nZ/media/69c3a19805117b04f1411afe.jpg",
+  img19: "https://assets.cdn.filesafe.space/tofqffUfOD2z8r3qU7nZ/media/69c3a1988e26a1398c644641.jpg",
+  img20: "https://assets.cdn.filesafe.space/tofqffUfOD2z8r3qU7nZ/media/69c3a19836226c7d4ce70a73.jpg",
+  img21: "https://assets.cdn.filesafe.space/tofqffUfOD2z8r3qU7nZ/media/69c3a198c1440322872f9173.jpg",
+  img22: "https://assets.cdn.filesafe.space/tofqffUfOD2z8r3qU7nZ/media/69c3a1988e26a1f913644642.jpg",
+  img23: "https://assets.cdn.filesafe.space/tofqffUfOD2z8r3qU7nZ/media/69c3a198bedf5a24bbde6dcd.jpg",
+  img24: "https://assets.cdn.filesafe.space/tofqffUfOD2z8r3qU7nZ/media/69c3a198c14403437c2f917f.jpg",
+  img25: "https://assets.cdn.filesafe.space/tofqffUfOD2z8r3qU7nZ/media/69c3a198bedf5aee74de6dd3.jpg",
+  img26: "https://assets.cdn.filesafe.space/tofqffUfOD2z8r3qU7nZ/media/69c3a1988e26a1bbf9644665.jpg",
+  img27: "https://assets.cdn.filesafe.space/tofqffUfOD2z8r3qU7nZ/media/69c3a19805117b4549411b08.jpg",
+  img28: "https://assets.cdn.filesafe.space/tofqffUfOD2z8r3qU7nZ/media/69c3a19836226cbbdbe70a8e.jpg",
+  img29: "https://assets.cdn.filesafe.space/tofqffUfOD2z8r3qU7nZ/media/69c3a19836226c2ac6e70a8f.jpg",
+  img30: "https://assets.cdn.filesafe.space/tofqffUfOD2z8r3qU7nZ/media/69c3a19805117b496b411b0b.jpg",
+  img31: "https://assets.cdn.filesafe.space/tofqffUfOD2z8r3qU7nZ/media/69c3a198bedf5abc16de6de4.jpg",
+  img32: "https://assets.cdn.filesafe.space/tofqffUfOD2z8r3qU7nZ/media/69c3a198bedf5a995bde6de6.jpg",
+  img33: "https://assets.cdn.filesafe.space/tofqffUfOD2z8r3qU7nZ/media/69c3a1988e26a15367644654.jpg",
+  img34: "https://assets.cdn.filesafe.space/tofqffUfOD2z8r3qU7nZ/media/69c3a198c14403cbbe2f9174.jpg",
+  img35: "https://assets.cdn.filesafe.space/tofqffUfOD2z8r3qU7nZ/media/69c3a1988e26a13c9264463f.jpg",
+  img36: "https://assets.cdn.filesafe.space/tofqffUfOD2z8r3qU7nZ/media/69c3a19836226cf125e70a8d.jpg",
+  img37: "https://assets.cdn.filesafe.space/tofqffUfOD2z8r3qU7nZ/media/69c3a19805117b45dc411b07.jpg",
+  img38: "https://assets.cdn.filesafe.space/tofqffUfOD2z8r3qU7nZ/media/69c3a19836226c82efe70a78.jpg",
+  img39: "https://assets.cdn.filesafe.space/tofqffUfOD2z8r3qU7nZ/media/69c3a19836226cfc24e70a72.jpg"
+};
+
+const ROOM_DATA = [
+  {
+    id: "suite-with-balcony",
+    name: "Suite with Balcony",
+    typeLabel: "Couples stay",
+    guestBand: "1-2",
+    beds: "1 queen bed",
+    size: 26,
+    fromRate: 3850,
+    startingRate: 0,
+    tags: ["Balcony", "City view", "Private bathroom"],
+    details: ["Refrigerator", "Electric kettle", "Desk", "Flat-screen TV", "Wardrobe or closet", "Linens"],
+    description: "A more polished stay for couples who want extra openness, city-facing light, and a balcony-led room experience.",
+    images: [IMG.img22, IMG.img23, IMG.img34, IMG.img05]
+  },
+  {
+    id: "one-bedroom-suite",
+    name: "One-Bedroom Suite",
+    typeLabel: "Spacious suite",
+    guestBand: "1-2",
+    beds: "1 queen bed",
+    size: 29,
+    fromRate: 3900,
+    startingRate: 0,
+    tags: ["Balcony", "City view", "Private bathroom"],
+    details: ["Refrigerator", "Electric kettle", "Sitting area", "Desk", "Flat-screen TV", "Wardrobe or closet"],
+    description: "A larger suite layout with more breathing room and lounge energy, shaped for guests who want a fuller stay rather than just a bed-and-bath setup.",
+    images: [IMG.img12, IMG.img25, IMG.img31, IMG.img38]
+  },
+  {
+    id: "family-studio",
+    name: "Family Studio",
+    typeLabel: "Group stay",
+    guestBand: "5+",
+    beds: "3 full beds",
+    size: 30,
+    fromRate: 5450,
+    startingRate: 0,
+    tags: ["Private bathroom", "Flat-screen TV", "Electric kettle"],
+    details: ["Desk", "Wardrobe or closet", "Linens", "Clothes rack", "Socket near bed", "Family-friendly layout"],
+    description: "The biggest room in the set, built for bigger family or barkada stays with generous sleeping capacity and an easy open-plan feel.",
+    images: [IMG.img13, IMG.img18, IMG.img16, IMG.img19]
+  },
+  {
+    id: "deluxe-twin-room",
+    name: "Deluxe Twin Room",
+    typeLabel: "Flexible twin",
+    guestBand: "1-2",
+    beds: "2 twin beds",
+    size: 18,
+    fromRate: 3450,
+    startingRate: 0,
+    tags: ["Private bathroom", "Flat-screen TV", "View"],
+    details: ["Electric kettle", "Desk", "Wardrobe or closet", "Linens", "Clothes rack", "Socket near bed"],
+    description: "A practical twin option for friends, colleagues, or guests who want separate beds without losing the warm EEKOS character.",
+    images: [IMG.img15, IMG.img26, IMG.img27, IMG.img01]
+  },
+  {
+    id: "deluxe-family-room",
+    name: "Deluxe Family Room",
+    typeLabel: "Family comfort",
+    guestBand: "3-4",
+    beds: "2 full beds",
+    size: 28,
+    fromRate: 4450,
+    startingRate: 0,
+    tags: ["Private bathroom", "Flat-screen TV", "Electric kettle"],
+    details: ["Sitting area", "Desk", "Wardrobe or closet", "Linens", "Clothes rack", "Socket near bed"],
+    description: "A strong family-friendly option with a roomier footprint, more sleeping flexibility, and enough openness for shared stays.",
+    images: [IMG.img18, IMG.img13, IMG.img19, IMG.img14]
+  },
+  {
+    id: "suite",
+    name: "Suite",
+    typeLabel: "Flexible suite",
+    guestBand: "3-4",
+    beds: "1 sofa bed + 1 queen bed",
+    size: 26,
+    fromRate: 3450,
+    startingRate: 0,
+    tags: ["Private bathroom", "Flat-screen TV", "Electric kettle"],
+    details: ["Desk", "Wardrobe or closet", "Linens", "Sofa bed", "Clothes rack", "Socket near bed"],
+    description: "A flexible suite layout that suits small families or mixed sleeping needs, with a softer lounge feel than a standard room.",
+    images: [IMG.img28, IMG.img03, IMG.img24, IMG.img30]
+  },
+  {
+    id: "deluxe-room",
+    name: "Deluxe Room",
+    typeLabel: "Classic stay",
+    guestBand: "1-2",
+    beds: "1 full bed",
+    size: 16,
+    fromRate: 3250,
+    startingRate: 0,
+    tags: ["Private bathroom", "Flat-screen TV", "Electric kettle"],
+    details: ["Desk", "Wardrobe or closet", "Linens", "Clothes rack", "Socket near bed", "Compact layout"],
+    description: "A compact, efficient room for short stays and simple getaways, with a straightforward layout that still feels clean and elevated.",
+    images: [IMG.img20, IMG.img06, IMG.img09, IMG.img17]
+  }
+];
+
+const HTML_ESCAPE_LOOKUP = {
+  "&": "&amp;",
+  "<": "&lt;",
+  ">": "&gt;",
+  '"': "&quot;",
+  "'": "&#39;"
+};
+function escapeHtml(value) {
+  return String(value ?? "").replace(/[&<>"']/g, (character) => HTML_ESCAPE_LOOKUP[character]);
+}
+function escapeAttribute(value) {
+  return escapeHtml(value).replace(/`/g, "&#96;");
+}
+
+function formatCurrency(value, currency = "PHP") {
+  return new Intl.NumberFormat("en-PH", {
+    style: "currency",
+    currency,
+    maximumFractionDigits: 0
+  }).format(Number(value || 0));
+}
+function formatDateValue(value) {
+  if (!value) {
+    return "";
+  }
+
+  const date = new Date(`${value}T00:00:00`);
+
+  return date.toLocaleDateString("en-PH", {
+    month: "short",
+    day: "numeric",
+    year: "numeric"
+  });
+}
+function getNights(checkin, checkout) {
+  if (!checkin || !checkout) {
+    return 0;
+  }
+
+  const start = new Date(`${checkin}T00:00:00`);
+  const end = new Date(`${checkout}T00:00:00`);
+  const diff = end.getTime() - start.getTime();
+  const nights = Math.round(diff / 86400000);
+
+  return nights > 0 ? nights : 0;
+}
+function getRoomStartingRate(room) {
+  const rate = Number(room?.startingRate || 0);
+  return Number.isFinite(rate) && rate > 0 ? rate : 0;
+}
+function getRoomReferenceRate(room) {
+  const rate = Number(room?.fromRate || 0);
+  return Number.isFinite(rate) && rate > 0 ? rate : 0;
+}
+function getRoomDisplayRate(room) {
+  return getRoomStartingRate(room) || getRoomReferenceRate(room);
+}
+function getDepositAmount(total, paymentConfig) {
+  if (!total || total <= 0) {
+    return 0;
+  }
+
+  if (paymentConfig.depositType === "fixed") {
+    return Math.max(Number(paymentConfig.depositValue) || 0, 0);
+  }
+
+  return Math.round(total * ((Number(paymentConfig.depositValue) || 0) / 100));
+}
+function buildGuestSummary(adultsValue, childrenValue) {
+  const adults = Number(adultsValue || 0);
+  const children = Number(childrenValue || 0);
+  const parts = [];
+
+  if (adults) {
+    parts.push(`${adults} ${adults === 1 ? "adult" : "adults"}`);
+  }
+
+  if (children) {
+    parts.push(`${children} ${children === 1 ? "child" : "children"}`);
+  }
+
+  return parts.join(", ") || "Select guests";
+}
+function getBookingFinancials({ room, checkin, checkout, paymentConfig }) {
+  const nights = getNights(checkin, checkout);
+  const rate = getRoomStartingRate(room);
+  const total = nights > 0 && rate > 0 ? nights * rate : 0;
+  const deposit = getDepositAmount(total, paymentConfig);
+  const balance = total > 0 ? Math.max(total - deposit, 0) : 0;
+
+  return { nights, rate, total, deposit, balance };
+}
+
+function hasLivePaymentUrl(paymentUrl) {
+  const normalized = String(paymentUrl || "").trim();
+  return normalized !== "" && normalized !== PAYMENT_URL_PLACEHOLDER;
+}
+function sanitizeParamValue(value, maxLength = 500) {
+  return String(value ?? "")
+    .replace(/[\u0000-\u001F\u007F]+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim()
+    .slice(0, maxLength);
+}
+function buildPaymentPayload(payload) {
+  const sanitizedEntries = Object.entries(payload).reduce((accumulator, [key, value]) => {
+    const sanitizedValue = sanitizeParamValue(value, key === "special_requests" ? 500 : 160);
+
+    if (sanitizedValue) {
+      accumulator[key] = sanitizedValue;
+    }
+
+    return accumulator;
+  }, {});
+
+  return new URLSearchParams(sanitizedEntries);
+}
+function buildPaymentHandoffUrl(paymentUrl, payload) {
+  if (!hasLivePaymentUrl(paymentUrl)) {
+    return null;
+  }
+
+  const params = buildPaymentPayload(payload).toString();
+  const separator = paymentUrl.includes("?") ? "&" : "?";
+
+  return params ? `${paymentUrl}${separator}${params}` : paymentUrl;
+}
+function createBookingReference(now = Date.now()) {
+  return `EEKOS-${String(now).slice(-8)}`;
+}
+
+function getFilteredRooms(rooms, state) {
+  let filteredRooms = Array.isArray(rooms) ? rooms.slice() : [];
+
+  if (state.guests !== "all") {
+    filteredRooms = filteredRooms.filter((room) => room.guestBand === state.guests);
+  }
+
+  if (state.balconyOnly) {
+    filteredRooms = filteredRooms.filter((room) => room.tags.includes("Balcony"));
+  }
+
+  if (state.sort === "size") {
+    filteredRooms.sort((left, right) => right.size - left.size);
+  }
+
+  return filteredRooms;
+}
+
+function toDateInputValue(date) {
+  const normalizedDate = new Date(date);
+  normalizedDate.setMinutes(normalizedDate.getMinutes() - normalizedDate.getTimezoneOffset());
+  return normalizedDate.toISOString().slice(0, 10);
+}
+function syncDateInputMinimums(checkinInput, checkoutInput, now = new Date()) {
+  const todayValue = toDateInputValue(now);
+  const minCheckoutDate = new Date(`${(checkinInput.value || todayValue)}T00:00:00`);
+
+  minCheckoutDate.setDate(minCheckoutDate.getDate() + 1);
+
+  checkinInput.min = todayValue;
+  checkoutInput.min = toDateInputValue(minCheckoutDate);
+
+  if (checkinInput.value && checkoutInput.value && checkoutInput.value <= checkinInput.value) {
+    checkoutInput.value = "";
+  }
+}
+function validateStayDetails({ checkin, checkout }) {
+  const todayValue = toDateInputValue(new Date());
+
+  if (!checkin) {
+    return {
+      valid: false,
+      message: "Please select your check-in date.",
+      field: "checkin"
+    };
+  }
+
+  if (!checkout) {
+    return {
+      valid: false,
+      message: "Please select your check-out date.",
+      field: "checkout"
+    };
+  }
+
+  if (checkin < todayValue) {
+    return {
+      valid: false,
+      message: "Check-in cannot be in the past.",
+      field: "checkin"
+    };
+  }
+
+  if (getNights(checkin, checkout) < 1) {
+    return {
+      valid: false,
+      message: "Check-out must be after check-in.",
+      field: "checkout"
+    };
+  }
+
+  return { valid: true, message: "", field: "" };
+}
+function validateGuestDetails({ fullName, email, phone }) {
+  const trimmedName = String(fullName || "").trim();
+  const trimmedEmail = String(email || "").trim();
+  const trimmedPhone = String(phone || "").trim();
+  const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  const phoneDigits = trimmedPhone.replace(/\D/g, "");
+
+  if (!trimmedName || !trimmedEmail || !trimmedPhone) {
+    return {
+      valid: false,
+      message: "Please complete your name, email, and phone number.",
+      field: !trimmedName ? "fullName" : !trimmedEmail ? "email" : "phone"
+    };
+  }
+
+  if (trimmedName.length < 2) {
+    return {
+      valid: false,
+      message: "Please enter the guest's full name.",
+      field: "fullName"
+    };
+  }
+
+  if (!emailPattern.test(trimmedEmail)) {
+    return {
+      valid: false,
+      message: "Please enter a valid email address.",
+      field: "email"
+    };
+  }
+
+  if (phoneDigits.length < 7) {
+    return {
+      valid: false,
+      message: "Please enter a valid phone number.",
+      field: "phone"
+    };
+  }
+
+  return { valid: true, message: "", field: "" };
+}
+
+function renderMedia(room) {
+  const validImages = (room.images || []).filter(Boolean);
+  const mainImage = validImages[0] || "";
+  const thumbnails = validImages.length > 1
+    ? `
+      <div class="eekos-room-thumbs">
+        ${validImages.slice(0, 4).map((image, index) => `
+          <button
+            type="button"
+            class="eekos-room-thumb ${index === 0 ? "is-active" : ""}"
+            data-room-id="${escapeAttribute(room.id)}"
+            data-image="${escapeAttribute(image)}"
+            aria-label="Show ${escapeAttribute(room.name)} image ${index + 1}"
+          >
+            <img src="${escapeAttribute(image)}" alt="${escapeAttribute(room.name)} thumbnail ${index + 1}">
+          </button>
+        `).join("")}
+      </div>
+    `
+    : "";
+
+  return `
+    <img
+      src="${escapeAttribute(mainImage)}"
+      alt="${escapeAttribute(room.name)}"
+      class="eekos-room-main-image"
+      data-room-main="${escapeAttribute(room.id)}"
+    >
+    ${thumbnails}
+  `;
+}
+
+function renderGuestBand(guestBand) {
+  return guestBand === "5+" ? "5+ guests" : `${guestBand} guests`;
+}
+
+function renderRoomRateTitle(room) {
+  const displayRate = getRoomDisplayRate(room);
+
+  if (!displayRate) {
+    return escapeHtml(ROOM_PRICING_TEXT.cardRateUnavailable);
+  }
+
+  return `${escapeHtml(formatCurrency(displayRate))} <span class="eekos-room-price-suffix">/ night</span>`;
+}
+
+function renderCardStayNotes() {
+  return ROOM_PRICING_TEXT.cardStayNotes.map((item) => `
+    <div class="eekos-room-rate">
+      <strong>${escapeHtml(item.title)}</strong>
+      <span>${escapeHtml(item.body)}</span>
+    </div>
+  `).join("");
+}
+
+function renderRoomCard(room, inquireUrl) {
+  const hasDisplayRate = getRoomDisplayRate(room) > 0;
+  const hasLiveRate = getRoomStartingRate(room) > 0;
+
+  return `
+    <article class="eekos-room-card" aria-label="${escapeAttribute(room.name)}">
+      <div class="eekos-room-media">
+        ${renderMedia(room)}
+      </div>
+
+      <div class="eekos-room-content">
+        <p class="eekos-room-eyebrow">${escapeHtml(room.typeLabel)}</p>
+        <h3 class="eekos-room-title">${escapeHtml(room.name)}</h3>
+
+        <ul class="eekos-room-specs" aria-label="${escapeAttribute(room.name)} specifications">
+          <li>${escapeHtml(renderGuestBand(room.guestBand))}</li>
+          <li>${escapeHtml(room.beds)}</li>
+          <li>${escapeHtml(String(room.size))} sq m</li>
+        </ul>
+
+        <p class="eekos-room-description">${escapeHtml(room.description)}</p>
+
+        <div class="eekos-room-tags">
+          ${(room.tags || []).map((tag) => `<span class="eekos-room-tag">${escapeHtml(tag)}</span>`).join("")}
+        </div>
+
+        <div class="eekos-room-details">
+          <p class="eekos-room-details-title">Room details</p>
+          <ul class="eekos-room-details-list">
+            ${(room.details || []).map((item) => `<li>${escapeHtml(item)}</li>`).join("")}
+          </ul>
+        </div>
+      </div>
+
+      <div class="eekos-room-cta">
+        <div>
+          <div class="eekos-room-price-panel">
+            <p class="eekos-room-price-label">${escapeHtml(hasDisplayRate ? ROOM_PRICING_TEXT.cardPriceLabel : ROOM_PRICING_TEXT.cardFallbackLabel)}</p>
+            <h4 class="eekos-room-price-title">${renderRoomRateTitle(room)}</h4>
+            <p class="eekos-room-price-note">
+              ${escapeHtml(hasLiveRate ? ROOM_PRICING_TEXT.cardLiveRateNote : ROOM_PRICING_TEXT.cardRateNote)}
+            </p>
+          </div>
+
+          <div class="eekos-room-rate-list">
+            ${renderCardStayNotes()}
+          </div>
+        </div>
+
+        <div class="eekos-room-actions">
+          <button type="button" class="eekos-btn eekos-btn--primary" data-open-booking="${escapeAttribute(room.id)}">Check dates &amp; price</button>
+          <a class="eekos-btn eekos-btn--secondary" href="${escapeAttribute(inquireUrl)}">Inquire</a>
+        </div>
+      </div>
+    </article>
+  `;
+}
+function renderRoomCards(rooms, inquireUrl) {
+  if (!rooms.length) {
+    return `
+      <div class="eekos-empty">
+        No rooms match the current filter. Try a different guest group or turn off the balcony filter.
+      </div>
+    `;
+  }
+
+  return rooms.map((room) => renderRoomCard(room, inquireUrl)).join("");
+}
+
+import {
+  buildGuestSummary,
+  formatCurrency,
+  formatDateValue,
+  getBookingFinancials,
+  getRoomStartingRate,
+  getRoomReferenceRate
+} from "./lib/booking.js";
+import {
+  buildPaymentHandoffUrl,
+  createBookingReference,
+  hasLivePaymentUrl
+} from "./lib/payment.js";
+
+
+
+const MODAL_FOCUSABLE_SELECTOR = [
+  "a[href]",
+  "button:not([disabled])",
+  "input:not([disabled])",
+  "select:not([disabled])",
+  "textarea:not([disabled])",
+  "[tabindex]:not([tabindex='-1'])"
+].join(", ");
+
+function queryWithin(container, selector) {
+  const node = container.querySelector(selector);
+
+  if (!node) {
+    throw new Error(`Missing selector: ${selector}`);
+  }
+
+  return node;
+}
+
+function isVisible(node) {
+  return !node.hasAttribute("hidden") && node.getClientRects().length > 0;
+}
+function initializeRoomSelector(root = document) {
+  const component = root.querySelector("#eekos-room-selector");
+
+  if (!component || component.dataset.eekosMounted === "true") {
+    return;
+  }
+
+  component.dataset.eekosMounted = "true";
+
+  const roomList = queryWithin(component, "#eekos-room-list");
+  const roomCount = queryWithin(component, "#eekos-room-count");
+  const roomNote = queryWithin(component, "#eekos-room-note");
+  const featureButton = queryWithin(component, "[data-feature='balcony']");
+  const guestButtons = component.querySelectorAll("[data-guests]");
+  const sortButtons = component.querySelectorAll("[data-sort]");
+
+  const modal = queryWithin(component, "#eekos-booking-modal");
+  const modalClose = queryWithin(component, "#eekos-modal-close");
+  const bookingForm = queryWithin(component, "#eekos-booking-form");
+  const confirmationBox = queryWithin(component, "#eekos-confirmation");
+  const closeConfirmation = queryWithin(component, "#eekos-close-confirmation");
+  const feedback = queryWithin(component, "#eekos-form-feedback");
+  const paymentNote = queryWithin(component, "#eekos-payment-note");
+  const submitButton = queryWithin(component, "#eekos-submit-booking");
+  const paymentStepTitle = queryWithin(component, "#eekos-payment-step-title");
+  const paymentStepCopy = queryWithin(component, "#eekos-payment-step-copy");
+  const paymentStateKicker = queryWithin(component, "#eekos-payment-state-kicker");
+
+  const checkinInput = queryWithin(component, "#eekos-checkin");
+  const checkoutInput = queryWithin(component, "#eekos-checkout");
+  const adultsInput = queryWithin(component, "#eekos-adults");
+  const childrenInput = queryWithin(component, "#eekos-children");
+  const fullNameInput = queryWithin(component, "#eekos-full-name");
+  const emailInput = queryWithin(component, "#eekos-email");
+  const phoneInput = queryWithin(component, "#eekos-phone");
+  const arrivalInput = queryWithin(component, "#eekos-arrival-time");
+  const specialRequestsInput = queryWithin(component, "#eekos-special-requests");
+
+  const summaryRoomName = queryWithin(component, "#eekos-summary-room-name");
+  const summaryGuests = queryWithin(component, "#eekos-summary-guests");
+  const summaryDates = queryWithin(component, "#eekos-summary-dates");
+  const summaryNights = queryWithin(component, "#eekos-summary-nights");
+  const summarySize = queryWithin(component, "#eekos-summary-size");
+  const summaryBed = queryWithin(component, "#eekos-summary-bed");
+  const summaryCardTitle = queryWithin(component, "#eekos-summary-card-title");
+  const summaryRateState = queryWithin(component, "#eekos-summary-rate-state");
+  const summaryRateCopy = queryWithin(component, "#eekos-summary-rate-copy");
+  const summaryRateLabel = queryWithin(component, "#eekos-summary-rate-label");
+  const summaryRatePreview = queryWithin(component, "#eekos-summary-rate-preview");
+  const summaryTotalRow = queryWithin(component, "#eekos-summary-total-row");
+  const summaryTotal = queryWithin(component, "#eekos-summary-total");
+  const summaryDepositRow = queryWithin(component, "#eekos-summary-deposit-row");
+  const summaryDeposit = queryWithin(component, "#eekos-summary-deposit");
+  const summaryBalanceRow = queryWithin(component, "#eekos-summary-balance-row");
+  const summaryBalance = queryWithin(component, "#eekos-summary-balance");
+  const paymentAmount = queryWithin(component, "#eekos-payment-amount");
+  const paymentCopy = queryWithin(component, "#eekos-payment-copy");
+  const confirmationRef = queryWithin(component, "#eekos-confirmation-ref");
+  const confirmationText = queryWithin(component, "#eekos-confirmation-text");
+
+  const fieldMap = {
+    checkin: checkinInput,
+    checkout: checkoutInput,
+    fullName: fullNameInput,
+    email: emailInput,
+    phone: phoneInput
+  };
+
+  const state = {
+    guests: "all",
+    sort: "default",
+    balconyOnly: false
+  };
+
+  const roomLookup = new Map(ROOM_DATA.map((room) => [room.id, room]));
+
+  let activeRoom = null;
+  let activeStep = 1;
+  let lastFocusedTrigger = null;
+  let bodyOverflowBeforeModal = "";
+
+  function isPaymentReady() {
+    return hasLivePaymentUrl(PAYMENT_CONFIG.paymentUrl);
+  }
+
+  function getFocusableElements() {
+    return Array.from(modal.querySelectorAll(MODAL_FOCUSABLE_SELECTOR)).filter(
+      (node) => !node.disabled && isVisible(node)
+    );
+  }
+
+  function focusField(fieldKey) {
+    const field = fieldMap[fieldKey];
+
+    if (!field) {
+      return;
+    }
+
+    requestAnimationFrame(() => {
+      field.focus({ preventScroll: true });
+      field.scrollIntoView({ block: "center", behavior: "smooth" });
+    });
+  }
+
+  function getStepFocusTarget(step) {
+    if (step === 1) {
+      return checkinInput;
+    }
+
+    if (step === 2) {
+      return paymentStepTitle;
+    }
+
+    return fullNameInput;
+  }
+
+  function clearInvalidStates() {
+    Object.values(fieldMap).forEach((field) => {
+      field.removeAttribute("aria-invalid");
+    });
+  }
+
+  function clearFeedback() {
+    feedback.textContent = "";
+    feedback.removeAttribute("data-state");
+  }
+
+  function setFeedback(message) {
+    feedback.textContent = message;
+    feedback.dataset.state = "error";
+  }
+
+  function markInvalidField(fieldKey) {
+    clearInvalidStates();
+
+    if (!fieldKey) {
+      return;
+    }
+
+    const field = fieldMap[fieldKey];
+
+    if (!field) {
+      return;
+    }
+
+    field.setAttribute("aria-invalid", "true");
+    focusField(fieldKey);
+  }
+
+  function syncStepIndicators(step) {
+    component.querySelectorAll("[data-step-indicator]").forEach((item) => {
+      const isActive = Number(item.getAttribute("data-step-indicator")) === step;
+
+      item.classList.toggle("is-active", isActive);
+
+      if (isActive) {
+        item.setAttribute("aria-current", "step");
+      } else {
+        item.removeAttribute("aria-current");
+      }
+    });
+  }
+
+  function syncStepPanes(step) {
+    component.querySelectorAll("[data-step-pane]").forEach((item) => {
+      item.classList.toggle("is-active", Number(item.getAttribute("data-step-pane")) === step);
+    });
+  }
+
+  function scrollModalToTop() {
+    if (typeof modal.scrollTo === "function") {
+      modal.scrollTo({ top: 0, behavior: "smooth" });
+      return;
+    }
+
+    modal.scrollTop = 0;
+  }
+
+  function setStep(step) {
+    activeStep = step;
+    syncStepIndicators(step);
+    syncStepPanes(step);
+    clearFeedback();
+
+    requestAnimationFrame(() => {
+      const focusTarget = getStepFocusTarget(step);
+
+      if (focusTarget && !modal.hidden) {
+        focusTarget.focus({ preventScroll: true });
+      }
+    });
+  }
+
+  function updatePaymentUiState() {
+    const paymentReady = isPaymentReady();
+
+    submitButton.textContent = paymentReady
+      ? BOOKING_UI_TEXT.paymentReadyButtonLabel
+      : BOOKING_UI_TEXT.paymentMissingButtonLabel;
+    submitButton.disabled = !paymentReady;
+    submitButton.classList.toggle("is-disabled", !paymentReady);
+    submitButton.setAttribute("aria-disabled", String(!paymentReady));
+
+    paymentNote.textContent = paymentReady
+      ? BOOKING_UI_TEXT.paymentReadyNote
+      : BOOKING_UI_TEXT.paymentMissingNote;
+    paymentNote.classList.toggle("is-warning", !paymentReady);
+  }
+
+  function updatePaymentCopyForConfig() {
+    confirmationText.textContent = isPaymentReady()
+      ? BOOKING_UI_TEXT.paymentReadyConfirmation
+      : BOOKING_UI_TEXT.paymentMissingConfirmation;
+  }
+
+  function setLivePricingRowsVisible(isVisible) {
+    summaryTotalRow.hidden = !isVisible;
+    summaryDepositRow.hidden = !isVisible;
+    summaryBalanceRow.hidden = !isVisible;
+  }
+
+  function updateSummary() {
+    if (!activeRoom) {
+      return;
+    }
+
+    const financials = getBookingFinancials({
+      room: activeRoom,
+      checkin: checkinInput.value,
+      checkout: checkoutInput.value,
+      paymentConfig: PAYMENT_CONFIG
+    });
+    const referenceRate = getRoomReferenceRate(activeRoom);
+    const paymentReady = isPaymentReady();
+    const referenceRateText = referenceRate > 0
+      ? `From ${formatCurrency(referenceRate, PAYMENT_CONFIG.currency)} / night`
+      : "Inquire for direct pricing";
+
+    summaryRoomName.textContent = activeRoom.name;
+    summaryGuests.textContent = buildGuestSummary(adultsInput.value, childrenInput.value);
+    summaryDates.textContent = checkinInput.value && checkoutInput.value
+      ? `${formatDateValue(checkinInput.value)} - ${formatDateValue(checkoutInput.value)}`
+      : "Select dates";
+    summaryNights.textContent = financials.nights
+      ? `${financials.nights} ${financials.nights === 1 ? "night" : "nights"}`
+      : "-";
+    summarySize.textContent = `${activeRoom.size} sq m`;
+    summaryBed.textContent = activeRoom.beds;
+
+    if (financials.rate > 0) {
+      setLivePricingRowsVisible(true);
+      summaryCardTitle.textContent = ROOM_PRICING_TEXT.summaryLiveTitle;
+      summaryRateState.textContent = ROOM_PRICING_TEXT.summaryLiveState;
+      summaryRateCopy.textContent = ROOM_PRICING_TEXT.summaryLiveCardCopy;
+      summaryRateLabel.textContent = "Nightly rate";
+      summaryRatePreview.textContent = `${formatCurrency(financials.rate, PAYMENT_CONFIG.currency)} / night`;
+      summaryTotal.textContent = formatCurrency(financials.total, PAYMENT_CONFIG.currency);
+      summaryDeposit.textContent = formatCurrency(financials.deposit, PAYMENT_CONFIG.currency);
+      summaryBalance.textContent = formatCurrency(financials.balance, PAYMENT_CONFIG.currency);
+      paymentStepTitle.textContent = ROOM_PRICING_TEXT.paymentStepTitleLive;
+      paymentStepCopy.textContent = ROOM_PRICING_TEXT.paymentStepCopyLive;
+      paymentStateKicker.textContent = ROOM_PRICING_TEXT.paymentStateKickerLive;
+      paymentAmount.textContent = formatCurrency(financials.total, PAYMENT_CONFIG.currency);
+      paymentCopy.textContent = paymentReady
+        ? "Guests should review the estimated stay total, deposit due today, and remaining balance before choosing how to pay."
+        : "This is an estimate only. Add the real hosted payment link before using this flow in production.";
+      return;
+    }
+
+    setLivePricingRowsVisible(false);
+    summaryCardTitle.textContent = ROOM_PRICING_TEXT.summaryReferenceTitle;
+    summaryRateLabel.textContent = ROOM_PRICING_TEXT.summaryReferenceRateLabel;
+
+    if (referenceRate > 0) {
+      summaryRatePreview.textContent = referenceRateText;
+      summaryRateState.textContent = paymentReady
+        ? ROOM_PRICING_TEXT.summaryReferenceStateReady
+        : ROOM_PRICING_TEXT.summaryReferenceStateMissing;
+      summaryRateCopy.textContent = paymentReady
+        ? ROOM_PRICING_TEXT.summaryReferenceCardCopyReady
+        : ROOM_PRICING_TEXT.summaryReferenceCardCopyMissing;
+      paymentStepTitle.textContent = paymentReady
+        ? ROOM_PRICING_TEXT.paymentStepTitleReferenceReady
+        : ROOM_PRICING_TEXT.paymentStepTitleReferenceMissing;
+      paymentStepCopy.textContent = paymentReady
+        ? ROOM_PRICING_TEXT.paymentStepCopyReferenceReady
+        : ROOM_PRICING_TEXT.paymentStepCopyReferenceMissing;
+      paymentStateKicker.textContent = paymentReady
+        ? ROOM_PRICING_TEXT.paymentStateKickerReferenceReady
+        : ROOM_PRICING_TEXT.paymentStateKickerReferenceMissing;
+      paymentAmount.textContent = referenceRateText;
+      paymentCopy.textContent = paymentReady
+        ? ROOM_PRICING_TEXT.summaryReferenceCopyReady
+        : `${ROOM_PRICING_TEXT.summaryReferenceCopyMissing} ${ROOM_PRICING_TEXT.summaryReferenceAmountMissing}.`;
+      return;
+    }
+
+    summaryRatePreview.textContent = "Inquire for direct pricing";
+    summaryRateState.textContent = paymentReady
+      ? ROOM_PRICING_TEXT.summaryReferenceStateReady
+      : ROOM_PRICING_TEXT.summaryReferenceStateMissing;
+    summaryRateCopy.textContent = paymentReady
+      ? ROOM_PRICING_TEXT.summaryReferenceCardCopyReady
+      : ROOM_PRICING_TEXT.summaryReferenceCardCopyMissing;
+    paymentStepTitle.textContent = paymentReady
+      ? ROOM_PRICING_TEXT.paymentStepTitleReferenceReady
+      : ROOM_PRICING_TEXT.paymentStepTitleReferenceMissing;
+    paymentStepCopy.textContent = paymentReady
+      ? "We will confirm the final amount on the secure checkout page after the guest reviews these stay details."
+      : ROOM_PRICING_TEXT.paymentStepCopyReferenceMissing;
+    paymentStateKicker.textContent = paymentReady
+      ? ROOM_PRICING_TEXT.paymentStateKickerReferenceReady
+      : ROOM_PRICING_TEXT.paymentStateKickerReferenceMissing;
+    paymentAmount.textContent = paymentReady
+      ? "Final amount shown at checkout"
+      : ROOM_PRICING_TEXT.summaryReferenceAmountMissing;
+    paymentCopy.textContent = paymentReady
+      ? "Final room rate and deposit will be confirmed before payment."
+      : "Final room rate and any deposit request should be confirmed manually until a live payment handoff is configured.";
+  }
+
+  function renderRooms() {
+    const rooms = getFilteredRooms(ROOM_DATA, state);
+    roomCount.textContent = `${rooms.length} room${rooms.length === 1 ? "" : "s"} available`;
+    roomList.innerHTML = renderRoomCards(rooms, INQUIRE_URL);
+  }
+
+  function resetFormState() {
+    bookingForm.reset();
+    bookingForm.classList.remove("eekos-hidden");
+    confirmationBox.classList.remove("is-active");
+    confirmationRef.textContent = "Booking reference";
+    clearFeedback();
+    clearInvalidStates();
+    syncDateInputMinimums(checkinInput, checkoutInput);
+    updatePaymentUiState();
+    updatePaymentCopyForConfig();
+  }
+
+  function openModal(room, trigger) {
+    activeRoom = room;
+    lastFocusedTrigger = trigger || document.activeElement;
+    bodyOverflowBeforeModal = document.body.style.overflow;
+
+    resetFormState();
+    setStep(1);
+    updateSummary();
+
+    modal.hidden = false;
+    document.body.style.overflow = "hidden";
+    scrollModalToTop();
+    requestAnimationFrame(() => {
+      checkinInput.focus({ preventScroll: true });
+    });
+  }
+
+  function closeModal() {
+    modal.hidden = true;
+    activeRoom = null;
+    document.body.style.overflow = bodyOverflowBeforeModal;
+    clearFeedback();
+    clearInvalidStates();
+
+    if (lastFocusedTrigger && typeof lastFocusedTrigger.focus === "function") {
+      lastFocusedTrigger.focus();
+    }
+  }
+
+  function validateStep(step) {
+    const result = step === 1
+      ? validateStayDetails({
+        checkin: checkinInput.value,
+        checkout: checkoutInput.value
+      })
+      : step === 3
+        ? validateGuestDetails({
+          fullName: fullNameInput.value,
+          email: emailInput.value,
+          phone: phoneInput.value
+        })
+        : { valid: true, message: "", field: "" };
+
+    if (!result.valid) {
+      setFeedback(result.message);
+      markInvalidField(result.field);
+      return false;
+    }
+
+    clearFeedback();
+    clearInvalidStates();
+    return true;
+  }
+
+  function moveToStep(targetStep) {
+    if (targetStep > activeStep && !validateStep(activeStep)) {
+      return;
+    }
+
+    setStep(targetStep);
+    updateSummary();
+    scrollModalToTop();
+  }
+
+  function handleRoomListClick(event) {
+    const thumbButton = event.target.closest(".eekos-room-thumb");
+
+    if (thumbButton && roomList.contains(thumbButton)) {
+      const roomId = thumbButton.getAttribute("data-room-id");
+      const image = thumbButton.getAttribute("data-image") || "";
+      const mainImage = roomList.querySelector(`[data-room-main="${roomId}"]`);
+
+      if (!mainImage) {
+        return;
+      }
+
+      mainImage.setAttribute("src", image);
+
+      roomList.querySelectorAll(`.eekos-room-thumb[data-room-id="${roomId}"]`).forEach((button) => {
+        button.classList.remove("is-active");
+      });
+
+      thumbButton.classList.add("is-active");
+      return;
+    }
+
+    const bookingButton = event.target.closest("[data-open-booking]");
+
+    if (!bookingButton || !roomList.contains(bookingButton)) {
+      return;
+    }
+
+    const roomId = bookingButton.getAttribute("data-open-booking") || "";
+    const room = roomLookup.get(roomId);
+
+    if (!room) {
+      return;
+    }
+
+    openModal(room, bookingButton);
+  }
+
+  function clearFieldErrorOnEdit(event) {
+    const field = event.currentTarget;
+
+    if (field.getAttribute("aria-invalid") === "true") {
+      field.removeAttribute("aria-invalid");
+      clearFeedback();
+    }
+  }
+
+  function trapModalFocus(event) {
+    if (event.key !== "Tab" || modal.hidden) {
+      return;
+    }
+
+    const focusableElements = getFocusableElements();
+
+    if (!focusableElements.length) {
+      return;
+    }
+
+    const first = focusableElements[0];
+    const last = focusableElements[focusableElements.length - 1];
+
+    if (event.shiftKey && (document.activeElement === first || !modal.contains(document.activeElement))) {
+      event.preventDefault();
+      last.focus();
+      return;
+    }
+
+    if (!event.shiftKey && document.activeElement === last) {
+      event.preventDefault();
+      first.focus();
+    }
+  }
+
+  roomList.addEventListener("click", handleRoomListClick);
+
+  guestButtons.forEach((button) => {
+    button.addEventListener("click", () => {
+      state.guests = button.getAttribute("data-guests") || "all";
+      guestButtons.forEach((item) => item.classList.remove("is-active"));
+      button.classList.add("is-active");
+      renderRooms();
+    });
+  });
+
+  sortButtons.forEach((button) => {
+    button.addEventListener("click", () => {
+      state.sort = button.getAttribute("data-sort") || "default";
+      sortButtons.forEach((item) => item.classList.remove("is-active"));
+      button.classList.add("is-active");
+      renderRooms();
+    });
+  });
+
+  featureButton.addEventListener("click", () => {
+    state.balconyOnly = !state.balconyOnly;
+    featureButton.classList.toggle("is-active", state.balconyOnly);
+    renderRooms();
+  });
+
+  component.querySelectorAll("[data-next-step]").forEach((button) => {
+    button.addEventListener("click", () => {
+      const nextStep = Number(button.getAttribute("data-next-step"));
+      moveToStep(nextStep);
+    });
+  });
+
+  component.querySelectorAll("[data-prev-step]").forEach((button) => {
+    button.addEventListener("click", () => {
+      const previousStep = Number(button.getAttribute("data-prev-step"));
+      setStep(previousStep);
+      updateSummary();
+      scrollModalToTop();
+    });
+  });
+
+  [checkinInput, checkoutInput, adultsInput, childrenInput].forEach((field) => {
+    field.addEventListener("input", () => {
+      clearFieldErrorOnEdit({ currentTarget: field });
+      updateSummary();
+    });
+    field.addEventListener("change", () => {
+      clearFieldErrorOnEdit({ currentTarget: field });
+
+      if (field === checkinInput) {
+        syncDateInputMinimums(checkinInput, checkoutInput);
+      }
+
+      updateSummary();
+    });
+  });
+
+  [fullNameInput, emailInput, phoneInput, arrivalInput, specialRequestsInput].forEach((field) => {
+    field.addEventListener("input", clearFieldErrorOnEdit);
+    field.addEventListener("change", clearFieldErrorOnEdit);
+  });
+
+  bookingForm.addEventListener("submit", (event) => {
+    event.preventDefault();
+
+    if (!validateStep(1) || !validateStep(3) || !activeRoom) {
+      return;
+    }
+
+    if (!isPaymentReady()) {
+      setStep(3);
+      setFeedback(BOOKING_UI_TEXT.paymentMissingNote);
+      submitButton.focus({ preventScroll: true });
+      scrollModalToTop();
+      return;
+    }
+
+    const reference = createBookingReference();
+    const paymentUrl = buildPaymentHandoffUrl(PAYMENT_CONFIG.paymentUrl, {
+      room: activeRoom.name,
+      room_id: activeRoom.id,
+      checkin: checkinInput.value,
+      checkout: checkoutInput.value,
+      adults: adultsInput.value || "2",
+      children: childrenInput.value || "0",
+      full_name: fullNameInput.value.trim(),
+      email: emailInput.value.trim(),
+      phone: phoneInput.value.trim(),
+      arrival_time: arrivalInput.value.trim(),
+      special_requests: specialRequestsInput.value.trim(),
+      reference
+    });
+
+    confirmationRef.textContent = `Booking reference - ${reference}`;
+    updatePaymentCopyForConfig();
+    bookingForm.classList.add("eekos-hidden");
+    confirmationBox.classList.add("is-active");
+    clearFeedback();
+
+    if (!paymentUrl) {
+      return;
+    }
+
+    if (PAYMENT_CONFIG.openInNewTab) {
+      const paymentWindow = window.open(paymentUrl, "_blank", "noopener");
+
+      if (!paymentWindow) {
+        window.location.assign(paymentUrl);
+      }
+
+      return;
+    }
+
+    window.location.assign(paymentUrl);
+  });
+
+  closeConfirmation.addEventListener("click", closeModal);
+  modalClose.addEventListener("click", closeModal);
+
+  modal.addEventListener("click", (event) => {
+    if (event.target === modal) {
+      closeModal();
+    }
+  });
+
+  document.addEventListener("keydown", (event) => {
+    if (modal.hidden) {
+      return;
+    }
+
+    if (event.key === "Escape") {
+      closeModal();
+      return;
+    }
+
+    trapModalFocus(event);
+  });
+
+  syncDateInputMinimums(checkinInput, checkoutInput);
+  updatePaymentUiState();
+  updatePaymentCopyForConfig();
+  roomNote.textContent = ROOM_DATA.some((room) => getRoomStartingRate(room) > 0)
+    ? ROOM_PRICING_TEXT.roomGuideLiveNote
+    : ROOM_PRICING_TEXT.roomGuideNote;
+  renderRooms();
+}
+
+initializeRoomSelector(document);
+
+})();
+</script>

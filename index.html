@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>EEKOS Room Selector Preview</title>
+    <meta
+      name="description"
+      content="Preview build for the EEKOS room selector with deposit booking handoff."
+    >
+    <link rel="stylesheet" href="./src/styles/room-selector.css">
+    <link rel="stylesheet" href="./src/styles/booking-modal.css">
+    <link rel="stylesheet" href="./src/styles/responsive.css">
+    <style>
+      body {
+        margin: 0;
+        padding: clamp(12px, 2vw, 24px);
+        background: #f6f1e8;
+        overflow-x: hidden;
+      }
+
+      .eekos-preview-shell {
+        width: 100%;
+        max-width: 1440px;
+        margin: 0 auto;
+      }
+    </style>
+  </head>
+  <body>
+    <main class="eekos-preview-shell">
+      <div id="app"></div>
+    </main>
+
+    <script type="module" src="./src/js/bootstrap.js"></script>
+  </body>
+</html>
+

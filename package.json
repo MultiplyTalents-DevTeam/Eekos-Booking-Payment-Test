@@ -1,0 +1,11 @@
+{
+  "name": "eekos-room-selector",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node ./scripts/build-ghl-embed.mjs",
+    "test": "node --test --experimental-test-isolation=none ./tests/*.test.mjs"
+  }
+}
+
