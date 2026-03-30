@@ -1,6 +1,6 @@
 import { BOOKING_UI_TEXT, PAYMENT_CONFIG } from "./config.js";
 import { formatCurrency, formatDateValue } from "./lib/booking.js";
-import { clearBookingDraft, loadBookingDraft } from "./lib/booking-draft.js";
+import { clearBookingDraft, loadBookingDraft, saveBookingDraft } from "./lib/booking-draft.js";
 import { escapeAttribute, escapeHtml } from "./lib/escape.js";
 import { buildPaymentHandoffUrl, hasLivePaymentUrl } from "./lib/payment.js";
 
@@ -123,6 +123,57 @@ function getPricingCopy(draft) {
   return draft.pricingSource === "reference"
     ? "This review uses the public room rate guide so guests can understand the likely cost before checkout. The hosted checkout still confirms the final payable amount before payment."
     : "Final amount is shown again on secure checkout before payment completes. Your room is confirmed after successful payment.";
+}
+
+async function createBookingIntent(draft) {
+  const response = await fetch("/api/ghl-booking-intent", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json"
+    },
+    body: JSON.stringify({
+      roomId: draft.roomId || "",
+      roomName: draft.roomName || "",
+      checkin: draft.checkin || "",
+      checkout: draft.checkout || "",
+      adults: draft.adults || "",
+      children: draft.children || "",
+      fullName: draft.fullName || "",
+      email: draft.email || "",
+      phone: draft.phone || "",
+      arrivalTime: draft.arrivalTime || "",
+      specialRequests: draft.specialRequests || "",
+      reference: draft.reference || "",
+      total: draft.total || "",
+      deposit: draft.deposit || "",
+      balance: draft.balance || "",
+      createdAt: draft.createdAt || ""
+    })
+  });
+
+  let payload = null;
+
+  try {
+    payload = await response.json();
+  } catch (error) {
+    payload = null;
+  }
+
+  if (!response.ok || !payload?.ok) {
+    return {
+      ok: false,
+      error: payload?.error || payload?.body?.message || payload?.statusText || "Unable to record booking intent in GHL."
+    };
+  }
+
+  return {
+    ok: true,
+    contactId: payload.contactId || "",
+    opportunityId: payload.opportunityId || "",
+    reservationStatus: payload.reservationStatus || "waiting_for_payment",
+    paymentStatus: payload.paymentStatus || "unpaid"
+  };
 }
 
 function renderEmptyState() {
@@ -293,7 +344,7 @@ function mountPaymentPage() {
     return;
   }
 
-  const draft = loadBookingDraft();
+  let draft = loadBookingDraft();
 
   if (!draft) {
     root.innerHTML = renderEmptyState();
@@ -324,7 +375,7 @@ function mountPaymentPage() {
   checkoutButton.classList.toggle("is-disabled", !paymentReady);
   checkoutButton.setAttribute("aria-disabled", paymentReady ? "false" : "true");
 
-  checkoutButton.addEventListener("click", () => {
+  checkoutButton.addEventListener("click", async () => {
     clearFeedback();
 
     if (!paymentReady) {
@@ -336,6 +387,29 @@ function mountPaymentPage() {
     checkoutButton.disabled = true;
     checkoutButton.classList.add("is-disabled");
     checkoutButton.textContent = "Preparing checkout...";
+
+    if (!draft.ghlOpportunityId || !draft.ghlContactId) {
+      const bookingIntent = await createBookingIntent(draft);
+
+      if (!bookingIntent.ok) {
+        setFeedback(`${bookingIntent.error} Update your GHL scopes, IDs, or token before using this as a live booking flow.`);
+        checkoutButton.disabled = false;
+        checkoutButton.classList.remove("is-disabled");
+        checkoutButton.textContent = originalButtonLabel;
+        return;
+      }
+
+      draft = {
+        ...draft,
+        ghlContactId: bookingIntent.contactId,
+        ghlOpportunityId: bookingIntent.opportunityId,
+        reservationStatus: bookingIntent.reservationStatus,
+        paymentStatus: bookingIntent.paymentStatus,
+        ghlSyncedAt: new Date().toISOString()
+      };
+
+      saveBookingDraft(draft);
+    }
 
     const paymentUrl = buildPaymentHandoffUrl(PAYMENT_CONFIG.paymentUrl, {
       room: draft.roomName || "",
@@ -353,7 +427,9 @@ function mountPaymentPage() {
       nights: draft.nights || "",
       estimated_total: parseAmount(draft.total) > 0 ? String(parseAmount(draft.total)) : "",
       deposit_due: parseAmount(draft.deposit) > 0 ? String(parseAmount(draft.deposit)) : "",
-      balance_due: parseAmount(draft.balance) > 0 ? String(parseAmount(draft.balance)) : ""
+      balance_due: parseAmount(draft.balance) > 0 ? String(parseAmount(draft.balance)) : "",
+      ghl_contact_id: draft.ghlContactId || "",
+      ghl_opportunity_id: draft.ghlOpportunityId || ""
     });
 
     if (!paymentUrl) {
@@ -377,11 +453,10 @@ function mountPaymentPage() {
       checkoutButton.classList.remove("is-disabled");
       checkoutButton.textContent = originalButtonLabel;
       return;
-    } else {
-      clearBookingDraft();
-      window.location.assign(paymentUrl);
-      return;
     }
+
+    clearBookingDraft();
+    window.location.assign(paymentUrl);
   });
 }
 
