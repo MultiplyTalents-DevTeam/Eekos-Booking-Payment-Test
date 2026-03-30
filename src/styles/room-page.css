@@ -1,10 +1,7 @@
 body {
   margin: 0;
   padding: clamp(12px, 2.2vw, 28px);
-  background:
-    radial-gradient(circle at 12% 0%, rgba(255, 255, 255, 0.58), transparent 48%),
-    radial-gradient(circle at 85% 0%, rgba(210, 184, 109, 0.22), transparent 42%),
-  #ece1d0;
+  background: #ece1d0;
   color: #2f3b34;
   font-family: Arial, sans-serif;
   line-height: 1.5;
@@ -20,7 +17,7 @@ body {
 .eekos-room-page {
   border: 1px solid rgba(216, 206, 192, 0.9);
   border-radius: 30px;
-  background: linear-gradient(180deg, rgba(247, 242, 234, 0.96) 0%, rgba(244, 238, 228, 0.92) 100%);
+  background: #ece1d0;
   box-shadow: 0 26px 56px rgba(23, 54, 41, 0.11);
   overflow: hidden;
 }

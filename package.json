@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "build": "node ./scripts/build-ghl-embed.mjs",
-    "test": "node --test --experimental-test-isolation=none ./tests/*.test.mjs"
+    "test": "node --test --experimental-test-isolation=none ./tests/*.test.mjs",
+    "check:ghl": "node ./scripts/check-ghl-ids.mjs"
   }
 }
 

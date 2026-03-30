@@ -1,10 +1,7 @@
 body {
   margin: 0;
   padding: clamp(12px, 2.2vw, 26px);
-  background:
-    radial-gradient(circle at 12% 0%, rgba(255, 255, 255, 0.58), transparent 48%),
-    radial-gradient(circle at 85% 0%, rgba(210, 184, 109, 0.22), transparent 42%),
-    #ece1d0;
+  background: #ece1d0;
   color: #2f3b34;
   font-family: Arial, sans-serif;
   line-height: 1.5;
@@ -60,7 +57,7 @@ body {
   max-width: none;
   border: 1px solid rgba(216, 206, 192, 0.92);
   border-radius: 28px;
-  background: linear-gradient(180deg, rgba(247, 242, 234, 0.96) 0%, rgba(244, 238, 228, 0.92) 100%);
+  background: #ece1d0;
   box-shadow: 0 26px 56px rgba(9, 15, 11, 0.15);
   overflow: hidden;
   grid-template-columns: minmax(0, 1.05fr) minmax(320px, 0.95fr);
@@ -83,7 +80,7 @@ body {
 }
 
 #eekos-room-selector .eekos-booking-side {
-  background: linear-gradient(180deg, rgba(241, 233, 221, 0.95) 0%, rgba(238, 228, 214, 0.96) 100%);
+  background: #ece1d0;
   justify-content: flex-start;
   gap: 16px;
 }

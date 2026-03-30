@@ -1,0 +1,74 @@
+export const GHL_ID_PLACEHOLDER_PREFIX = "__SET_GHL_";
+
+export const GHL_CONFIG = {
+  locationId: "__SET_GHL_LOCATION_ID__",
+  calendars: {
+    masterCalendarId: "__SET_GHL_MASTER_CALENDAR_ID__"
+  },
+  pipeline: {
+    reservationsPipelineId: "__SET_GHL_RESERVATIONS_PIPELINE_ID__",
+    stages: {
+      newInquiryStageId: "__SET_GHL_STAGE_NEW_INQUIRY_ID__",
+      waitingForPaymentStageId: "__SET_GHL_STAGE_WAITING_FOR_PAYMENT_ID__",
+      paymentReceivedStageId: "__SET_GHL_STAGE_PAYMENT_RECEIVED_ID__",
+      confirmedStageId: "__SET_GHL_STAGE_CONFIRMED_ID__",
+      inquiryOnlyStageId: "__SET_GHL_STAGE_INQUIRY_ONLY_ID__",
+      expiredStageId: "__SET_GHL_STAGE_EXPIRED_ID__",
+      cancelledStageId: "__SET_GHL_STAGE_CANCELLED_ID__",
+      noShowStageId: "__SET_GHL_STAGE_NO_SHOW_ID__",
+      completedStageId: "__SET_GHL_STAGE_COMPLETED_ID__"
+    }
+  },
+  customFields: {
+    roomNameFieldId: "__SET_GHL_FIELD_ROOM_NAME_ID__",
+    checkInDateFieldId: "__SET_GHL_FIELD_CHECK_IN_DATE_ID__",
+    checkOutDateFieldId: "__SET_GHL_FIELD_CHECK_OUT_DATE_ID__",
+    reservationStatusFieldId: "__SET_GHL_FIELD_RESERVATION_STATUS_ID__",
+    paymentStatusFieldId: "__SET_GHL_FIELD_PAYMENT_STATUS_ID__",
+    finalTotalAmountFieldId: "__SET_GHL_FIELD_FINAL_TOTAL_AMOUNT_ID__",
+    holdExpiresAtFieldId: "__SET_GHL_FIELD_HOLD_EXPIRES_AT_ID__",
+    specialRequestsFieldId: "__SET_GHL_FIELD_SPECIAL_REQUESTS_ID__",
+    adultCountFieldId: "__SET_GHL_FIELD_ADULT_COUNT_ID__",
+    childCountFieldId: "__SET_GHL_FIELD_CHILD_COUNT_ID__",
+    paymentReferenceFieldId: "__SET_GHL_FIELD_PAYMENT_REFERENCE_ID__"
+  }
+};
+
+export function hasLiveGhlId(value) {
+  const normalized = String(value || "").trim();
+
+  if (!normalized) {
+    return false;
+  }
+
+  return !normalized.startsWith(GHL_ID_PLACEHOLDER_PREFIX);
+}
+
+export function collectMissingGhlConfigPaths(config = GHL_CONFIG, pathPrefix = "") {
+  return Object.entries(config).reduce((missingPaths, [key, value]) => {
+    const nextPath = pathPrefix ? `${pathPrefix}.${key}` : key;
+
+    if (value && typeof value === "object" && !Array.isArray(value)) {
+      return missingPaths.concat(collectMissingGhlConfigPaths(value, nextPath));
+    }
+
+    if (!hasLiveGhlId(value)) {
+      missingPaths.push(nextPath);
+    }
+
+    return missingPaths;
+  }, []);
+}
+
+export function isGhlConfigReady(config = GHL_CONFIG) {
+  return collectMissingGhlConfigPaths(config).length === 0;
+}
+
+export function summarizeGhlConfig(config = GHL_CONFIG) {
+  const missingPaths = collectMissingGhlConfigPaths(config);
+
+  return {
+    ready: missingPaths.length === 0,
+    missingPaths
+  };
+}

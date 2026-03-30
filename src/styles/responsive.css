@@ -40,7 +40,7 @@
 @media (max-width: 991px) {
   #eekos-room-selector .eekos-room-shell {
     padding: 16px;
-    border-radius: 24px;
+    border-radius: 0;
   }
 
   #eekos-room-selector .eekos-room-toolbar {
@@ -89,7 +89,7 @@
 @media (max-width: 767px) {
   #eekos-room-selector .eekos-room-shell {
     padding: 14px;
-    border-radius: 20px;
+    border-radius: 0;
   }
 
   #eekos-room-selector .eekos-room-toolbar {
@@ -372,7 +372,7 @@
 
 @media (max-width: 480px) {
   #eekos-room-selector .eekos-room-shell {
-    border-radius: 16px;
+    border-radius: 0;
     padding: 12px;
   }
 
