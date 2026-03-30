@@ -1,5 +1,5 @@
 #eekos-room-selector {
-  --eekos-bg: #f6f1e8;
+  --eekos-bg: #ece1d0;
   --eekos-surface: #f2ece2;
   --eekos-card: #f7f2ea;
   --eekos-border: #d8cec0;
@@ -18,7 +18,7 @@
   font-family: Arial, sans-serif;
   line-height: 1.5;
   color: var(--eekos-text);
-  background: transparent;
+  background: var(--eekos-bg);
   -webkit-text-size-adjust: 100%;
 }
 
