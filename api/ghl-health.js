@@ -1,6 +1,7 @@
 import {
   GHL_CONFIG,
   hasLiveGhlId,
+  resolveGhlConfig,
   summarizeGhlConfig
 } from "../src/js/ghl-config.js";
 
@@ -88,15 +89,15 @@ function buildEntityCheck(label, configuredId, lookup) {
   };
 }
 
-function buildFieldChecks(fieldLookup) {
-  return Object.entries(GHL_CONFIG.customFields).reduce((accumulator, [configKey, configuredId]) => {
+function buildFieldChecks(config, fieldLookup) {
+  return Object.entries(config.customFields).reduce((accumulator, [configKey, configuredId]) => {
     accumulator[configKey] = buildEntityCheck(configKey, configuredId, fieldLookup);
     return accumulator;
   }, {});
 }
 
-function buildStageChecks(stageLookup) {
-  return Object.entries(GHL_CONFIG.pipeline.stages).reduce((accumulator, [configKey, configuredId]) => {
+function buildStageChecks(config, stageLookup) {
+  return Object.entries(config.pipeline.stages).reduce((accumulator, [configKey, configuredId]) => {
     accumulator[configKey] = buildEntityCheck(configKey, configuredId, stageLookup);
     return accumulator;
   }, {});
@@ -168,7 +169,11 @@ export default async function handler(req, res) {
       return res.status(500).json({ ok: false, error: "Missing GHL_LOCATION_ID" });
     }
 
-    const configSummary = summarizeGhlConfig(GHL_CONFIG);
+    const resolvedConfig = resolveGhlConfig(process.env, {
+      ...GHL_CONFIG,
+      locationId
+    });
+    const configSummary = summarizeGhlConfig(resolvedConfig);
 
     const [customFieldsResult, calendarsResult, pipelinesResult] = await Promise.all([
       fetchGhl(`/locations/${locationId}/customFields`, token),
@@ -186,7 +191,7 @@ export default async function handler(req, res) {
     const fieldLookup = toLookup(customFields);
     const pipelineLookup = toLookup(pipelines);
 
-    const configuredPipelineId = GHL_CONFIG.pipeline.reservationsPipelineId;
+    const configuredPipelineId = resolvedConfig.pipeline.reservationsPipelineId;
     const pipelineMatch = hasLiveGhlId(configuredPipelineId)
       ? pipelineLookup.get(configuredPipelineId) || null
       : null;
@@ -197,10 +202,10 @@ export default async function handler(req, res) {
         configuredId: locationId,
         configured: true
       },
-      masterCalendar: buildEntityCheck("masterCalendarId", GHL_CONFIG.calendars.masterCalendarId, calendarLookup),
+      masterCalendar: buildEntityCheck("masterCalendarId", resolvedConfig.calendars.masterCalendarId, calendarLookup),
       reservationsPipeline: buildEntityCheck("reservationsPipelineId", configuredPipelineId, pipelineLookup),
-      stages: buildStageChecks(stageLookup),
-      customFields: buildFieldChecks(fieldLookup)
+      stages: buildStageChecks(resolvedConfig, stageLookup),
+      customFields: buildFieldChecks(resolvedConfig, fieldLookup)
     };
 
     const payload = {
@@ -208,6 +213,7 @@ export default async function handler(req, res) {
       locationId,
       configReady: configSummary.ready,
       missingConfigPaths: configSummary.missingPaths,
+      configSource: "env_then_file_fallback",
       endpoints: {
         customFields: summarizeEndpoint(customFieldsResult, customFields, (field) => ({
           id: field.id,

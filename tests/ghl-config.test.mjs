@@ -4,13 +4,41 @@ import assert from "node:assert/strict";
 import {
   collectMissingGhlConfigPaths,
   hasLiveGhlId,
-  isGhlConfigReady
+  isGhlConfigReady,
+  resolveGhlConfig
 } from "../src/js/ghl-config.js";
 
 test("hasLiveGhlId rejects blank and placeholder values", () => {
   assert.equal(hasLiveGhlId(""), false);
   assert.equal(hasLiveGhlId("__SET_GHL_LOCATION_ID__"), false);
   assert.equal(hasLiveGhlId("abc123"), true);
+});
+
+test("resolveGhlConfig prefers env vars over placeholder file values", () => {
+  const resolved = resolveGhlConfig({
+    GHL_LOCATION_ID: "loc_env",
+    GHL_RESERVATIONS_PIPELINE_ID: "pipe_env",
+    GHL_FIELD_ROOM_NAME_ID: "field_env"
+  }, {
+    locationId: "__SET_GHL_LOCATION_ID__",
+    calendars: {
+      masterCalendarId: "cal_file"
+    },
+    pipeline: {
+      reservationsPipelineId: "__SET_GHL_RESERVATIONS_PIPELINE_ID__",
+      stages: {
+        confirmedStageId: "stage_file"
+      }
+    },
+    customFields: {
+      roomNameFieldId: "__SET_GHL_FIELD_ROOM_NAME_ID__"
+    }
+  });
+
+  assert.equal(resolved.locationId, "loc_env");
+  assert.equal(resolved.calendars.masterCalendarId, "cal_file");
+  assert.equal(resolved.pipeline.reservationsPipelineId, "pipe_env");
+  assert.equal(resolved.customFields.roomNameFieldId, "field_env");
 });
 
 test("collectMissingGhlConfigPaths returns nested placeholder paths", () => {

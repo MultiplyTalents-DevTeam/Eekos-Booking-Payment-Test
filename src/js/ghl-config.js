@@ -34,6 +34,42 @@ export const GHL_CONFIG = {
   }
 };
 
+export function resolveGhlConfig(env = {}, baseConfig = GHL_CONFIG) {
+  return {
+    locationId: env.GHL_LOCATION_ID || baseConfig.locationId,
+    calendars: {
+      masterCalendarId: env.GHL_MASTER_CALENDAR_ID || baseConfig.calendars.masterCalendarId
+    },
+    pipeline: {
+      reservationsPipelineId: env.GHL_RESERVATIONS_PIPELINE_ID || baseConfig.pipeline.reservationsPipelineId,
+      stages: {
+        newInquiryStageId: env.GHL_STAGE_NEW_INQUIRY_ID || baseConfig.pipeline.stages.newInquiryStageId,
+        waitingForPaymentStageId: env.GHL_STAGE_WAITING_FOR_PAYMENT_ID || baseConfig.pipeline.stages.waitingForPaymentStageId,
+        paymentReceivedStageId: env.GHL_STAGE_PAYMENT_RECEIVED_ID || baseConfig.pipeline.stages.paymentReceivedStageId,
+        confirmedStageId: env.GHL_STAGE_CONFIRMED_ID || baseConfig.pipeline.stages.confirmedStageId,
+        inquiryOnlyStageId: env.GHL_STAGE_INQUIRY_ONLY_ID || baseConfig.pipeline.stages.inquiryOnlyStageId,
+        expiredStageId: env.GHL_STAGE_EXPIRED_ID || baseConfig.pipeline.stages.expiredStageId,
+        cancelledStageId: env.GHL_STAGE_CANCELLED_ID || baseConfig.pipeline.stages.cancelledStageId,
+        noShowStageId: env.GHL_STAGE_NO_SHOW_ID || baseConfig.pipeline.stages.noShowStageId,
+        completedStageId: env.GHL_STAGE_COMPLETED_ID || baseConfig.pipeline.stages.completedStageId
+      }
+    },
+    customFields: {
+      roomNameFieldId: env.GHL_FIELD_ROOM_NAME_ID || baseConfig.customFields.roomNameFieldId,
+      checkInDateFieldId: env.GHL_FIELD_CHECK_IN_DATE_ID || baseConfig.customFields.checkInDateFieldId,
+      checkOutDateFieldId: env.GHL_FIELD_CHECK_OUT_DATE_ID || baseConfig.customFields.checkOutDateFieldId,
+      reservationStatusFieldId: env.GHL_FIELD_RESERVATION_STATUS_ID || baseConfig.customFields.reservationStatusFieldId,
+      paymentStatusFieldId: env.GHL_FIELD_PAYMENT_STATUS_ID || baseConfig.customFields.paymentStatusFieldId,
+      finalTotalAmountFieldId: env.GHL_FIELD_FINAL_TOTAL_AMOUNT_ID || baseConfig.customFields.finalTotalAmountFieldId,
+      holdExpiresAtFieldId: env.GHL_FIELD_HOLD_EXPIRES_AT_ID || baseConfig.customFields.holdExpiresAtFieldId,
+      specialRequestsFieldId: env.GHL_FIELD_SPECIAL_REQUESTS_ID || baseConfig.customFields.specialRequestsFieldId,
+      adultCountFieldId: env.GHL_FIELD_ADULT_COUNT_ID || baseConfig.customFields.adultCountFieldId,
+      childCountFieldId: env.GHL_FIELD_CHILD_COUNT_ID || baseConfig.customFields.childCountFieldId,
+      paymentReferenceFieldId: env.GHL_FIELD_PAYMENT_REFERENCE_ID || baseConfig.customFields.paymentReferenceFieldId
+    }
+  };
+}
+
 export function hasLiveGhlId(value) {
   const normalized = String(value || "").trim();
 
