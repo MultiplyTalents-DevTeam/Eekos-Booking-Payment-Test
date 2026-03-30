@@ -10,10 +10,15 @@
   position: fixed;
   inset: 0;
   z-index: 999999;
-  background: var(--eekos-overlay);
+  background: rgba(20, 26, 23, 0);
   padding: 24px;
   overflow-y: auto;
   overscroll-behavior: contain;
+  transition: background 0.3s ease;
+}
+
+#eekos-room-selector .eekos-booking-modal.is-open {
+  background: var(--eekos-overlay);
 }
 
 #eekos-room-selector .eekos-booking-dialog {
@@ -27,6 +32,14 @@
   box-shadow: 0 24px 64px rgba(9, 15, 11, 0.25);
   display: grid;
   grid-template-columns: minmax(0, 1.1fr) 360px;
+  opacity: 0;
+  transform: translateY(20px) scale(0.98);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+#eekos-room-selector .eekos-booking-modal.is-open .eekos-booking-dialog {
+  opacity: 1;
+  transform: translateY(0) scale(1);
 }
 
 #eekos-room-selector .eekos-booking-main {
@@ -409,5 +422,17 @@
 
 #eekos-room-selector .eekos-micro.is-warning {
   color: #8a4b34;
+}
+
+#eekos-room-selector .eekos-field-error:empty {
+  display: none;
+}
+
+#eekos-room-selector .eekos-field-error {
+  color: #914b32;
+  font-size: 13px;
+  line-height: 1.4;
+  margin-top: 4px;
+  padding-left: 2px;
 }
 

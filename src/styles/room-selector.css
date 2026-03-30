@@ -29,15 +29,20 @@
 #eekos-room-selector .eekos-room-shell {
   width: 100%;
   min-width: 0;
+  padding: clamp(16px, 2.1vw, 28px);
+  border: 1px solid rgba(216, 206, 192, 0.9);
+  border-radius: 30px;
+  background: linear-gradient(180deg, rgba(247, 242, 234, 0.92) 0%, rgba(242, 236, 226, 0.88) 100%);
+  box-shadow: 0 26px 54px rgba(23, 54, 41, 0.08);
 }
 
 #eekos-room-selector .eekos-room-toolbar {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 14px;
-  margin: 0 0 24px;
-  padding: 18px 0 0;
+  gap: 12px;
+  margin: 0 0 22px;
+  padding: 2px 0 0;
 }
 
 #eekos-room-selector .eekos-toolbar-label {
@@ -129,8 +134,8 @@
   justify-content: space-between;
   align-items: center;
   gap: 16px;
-  margin: 0 0 18px;
-  padding: 14px 0 0;
+  margin: 0 0 20px;
+  padding: 16px 0 0;
   border-top: 1px solid var(--eekos-border-soft);
 }
 
@@ -145,7 +150,7 @@
 #eekos-room-selector .eekos-room-note {
   color: #b29d81;
   font-size: 13px;
-  line-height: 1.5;
+  line-height: 1.6;
   max-width: 460px;
   text-align: left;
   margin: 0;
@@ -153,7 +158,301 @@
 
 #eekos-room-selector .eekos-room-list {
   display: grid;
-  gap: 22px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(16px, 1.3vw, 24px);
+  align-items: stretch;
+}
+
+@keyframes eekos-fade-up {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+#eekos-room-selector .eekos-room-teaser {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid rgba(216, 206, 192, 0.9);
+  border-radius: 24px;
+  background: var(--eekos-card);
+  box-shadow: 0 12px 32px rgba(23, 54, 41, 0.07);
+  overflow: hidden;
+  cursor: pointer;
+  scroll-snap-align: start;
+  transition: transform 0.24s ease, box-shadow 0.24s ease, border-color 0.24s ease;
+  text-decoration: none;
+  color: inherit;
+  animation: eekos-fade-up 0.4s ease forwards;
+}
+
+#eekos-room-selector .eekos-room-teaser:hover {
+  transform: translateY(-4px);
+  border-color: #cdb99e;
+  box-shadow: 0 20px 44px rgba(23, 54, 41, 0.12);
+}
+
+#eekos-room-selector .eekos-room-teaser:focus-visible {
+  outline: 2px solid rgba(31, 92, 67, 0.35);
+  outline-offset: 2px;
+}
+
+#eekos-room-selector .eekos-room-teaser-media {
+  position: relative;
+  height: clamp(200px, 19vw, 300px);
+  background: #e8ddcb;
+}
+
+#eekos-room-selector .eekos-room-teaser-image {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+}
+
+#eekos-room-selector .eekos-room-teaser-badge {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  padding: 8px 14px;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.93);
+  color: #4f4333;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+#eekos-room-selector .eekos-room-teaser-content {
+  display: flex;
+  flex-direction: column;
+  min-height: clamp(190px, 13.2vw, 244px);
+  padding: 14px 14px 16px;
+}
+
+#eekos-room-selector .eekos-room-teaser-title {
+  margin: 0 0 6px;
+  color: var(--eekos-heading);
+  font-family: "Nano Sans Georgian", Georgia, serif;
+  font-size: clamp(27px, 1.95vw, 35px);
+  line-height: 1.04;
+  font-weight: 700;
+}
+
+#eekos-room-selector .eekos-room-teaser-meta {
+  margin: 0 0 10px;
+  color: #6f785f;
+  font-size: 13px;
+  line-height: 1.42;
+}
+
+#eekos-room-selector .eekos-room-teaser-price {
+  margin: 0 0 6px;
+  color: var(--eekos-heading);
+  font-family: "Nano Sans Georgian", Georgia, serif;
+  font-size: clamp(25px, 1.95vw, 35px);
+  line-height: 1.02;
+  font-weight: 700;
+}
+
+#eekos-room-selector .eekos-room-teaser-note {
+  margin: 0 0 12px;
+  color: #a38766;
+  font-size: 12px;
+  line-height: 1.42;
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+#eekos-room-selector .eekos-room-teaser-foot {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(216, 206, 192, 0.7);
+  color: #1f5c43;
+  font-size: 12px;
+  line-height: 1.3;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-top: auto;
+}
+
+#eekos-room-selector .eekos-room-detail-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 999996;
+  background: rgba(20, 26, 23, 0);
+  padding: clamp(12px, 2vw, 24px);
+  overflow-y: auto;
+  transition: background 0.3s ease;
+}
+
+#eekos-room-selector .eekos-room-detail-modal.is-open {
+  background: rgba(20, 26, 23, 0.58);
+}
+
+#eekos-room-selector .eekos-room-detail-dialog {
+  position: relative;
+  width: 100%;
+  max-width: 1160px;
+  margin: 18px auto;
+  border: 1px solid var(--eekos-border);
+  border-radius: 28px;
+  background: #f7f2ea;
+  box-shadow: 0 30px 70px rgba(9, 15, 11, 0.26);
+  overflow: hidden;
+  opacity: 0;
+  transform: translateY(20px) scale(0.98);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+#eekos-room-selector .eekos-room-detail-modal.is-open .eekos-room-detail-dialog {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+#eekos-room-selector .eekos-room-detail-close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  z-index: 2;
+  appearance: none;
+  border: 1px solid var(--eekos-border);
+  border-radius: 999px;
+  width: 42px;
+  height: 42px;
+  background: rgba(255, 255, 255, 0.92);
+  color: var(--eekos-heading);
+  font-size: 24px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+#eekos-room-selector .eekos-room-detail-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+}
+
+#eekos-room-selector .eekos-room-detail-media {
+  min-width: 0;
+  border-right: 1px solid var(--eekos-border-soft);
+  background: #e8ddcb;
+}
+
+#eekos-room-selector .eekos-room-detail-media img {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  display: block;
+  object-fit: cover;
+}
+
+#eekos-room-selector .eekos-room-detail-thumbs {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 8px;
+  padding: 12px;
+  background: #efe7da;
+  border-top: 1px solid rgba(216, 206, 192, 0.85);
+}
+
+#eekos-room-selector .eekos-room-detail-content {
+  padding: clamp(20px, 3vw, 34px);
+}
+
+#eekos-room-selector .eekos-room-detail-eyebrow {
+  margin: 0 0 8px;
+  color: #6d8a73;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+#eekos-room-selector .eekos-room-detail-title {
+  margin: 0 0 10px;
+  color: var(--eekos-heading);
+  font-family: "Nano Sans Georgian", Georgia, serif;
+  font-size: 42px;
+  line-height: 1.02;
+  font-weight: 700;
+}
+
+#eekos-room-selector .eekos-room-detail-price {
+  margin: 0 0 14px;
+  color: #1f5c43;
+  font-size: 15px;
+  line-height: 1.45;
+  font-weight: 700;
+}
+
+#eekos-room-selector .eekos-room-detail-specs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 14px;
+  list-style: none;
+  padding: 0;
+  margin: 0 0 14px;
+  color: #6f785f;
+  font-size: 14px;
+}
+
+#eekos-room-selector .eekos-room-detail-description {
+  margin: 0 0 16px;
+  color: #6f5f49;
+  font-size: 15px;
+  line-height: 1.68;
+}
+
+#eekos-room-selector .eekos-room-detail-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 0 0 18px;
+}
+
+#eekos-room-selector .eekos-room-detail-amenities-wrap {
+  padding-top: 16px;
+  border-top: 1px solid var(--eekos-border-soft);
+}
+
+#eekos-room-selector .eekos-room-detail-amenities {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px 14px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+#eekos-room-selector .eekos-room-detail-amenities li {
+  color: #7c6b56;
+  font-size: 13px;
+  line-height: 1.45;
+  position: relative;
+  padding-left: 14px;
+}
+
+#eekos-room-selector .eekos-room-detail-amenities li::before {
+  content: "";
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--eekos-gold);
+  position: absolute;
+  left: 0;
+  top: 0.55em;
+}
+
+#eekos-room-selector .eekos-room-detail-actions {
+  display: grid;
+  gap: 10px;
+  margin-top: 20px;
 }
 
 #eekos-room-selector .eekos-room-card {

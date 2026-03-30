@@ -5,6 +5,7 @@ import {
   formatCurrency,
   formatDateValue,
   getBookingFinancials,
+  getRoomDisplayRate,
   getRoomStartingRate,
   getRoomReferenceRate
 } from "./lib/booking.js";
@@ -55,6 +56,20 @@ export function initializeRoomSelector(root = document) {
   const featureButton = queryWithin(component, "[data-feature='balcony']");
   const guestButtons = component.querySelectorAll("[data-guests]");
   const sortButtons = component.querySelectorAll("[data-sort]");
+
+  const roomDetailModal = queryWithin(component, "#eekos-room-detail-modal");
+  const roomDetailClose = queryWithin(component, "#eekos-room-detail-close");
+  const roomDetailTitle = queryWithin(component, "#eekos-room-detail-title");
+  const roomDetailEyebrow = queryWithin(component, "#eekos-room-detail-eyebrow");
+  const roomDetailPrice = queryWithin(component, "#eekos-room-detail-price");
+  const roomDetailDescription = queryWithin(component, "#eekos-room-detail-description");
+  const roomDetailSpecs = queryWithin(component, "#eekos-room-detail-specs");
+  const roomDetailTags = queryWithin(component, "#eekos-room-detail-tags");
+  const roomDetailAmenities = queryWithin(component, "#eekos-room-detail-amenities");
+  const roomDetailMainImage = queryWithin(component, "#eekos-room-detail-main-image");
+  const roomDetailThumbs = queryWithin(component, "#eekos-room-detail-thumbs");
+  const roomDetailBook = queryWithin(component, "#eekos-room-detail-book");
+  const roomDetailInquire = queryWithin(component, "#eekos-room-detail-inquire");
 
   const modal = queryWithin(component, "#eekos-booking-modal");
   const modalClose = queryWithin(component, "#eekos-modal-close");
@@ -117,16 +132,18 @@ export function initializeRoomSelector(root = document) {
   const roomLookup = new Map(ROOM_DATA.map((room) => [room.id, room]));
 
   let activeRoom = null;
+  let activeDetailRoom = null;
   let activeStep = 1;
   let lastFocusedTrigger = null;
+  let lastDetailFocusedTrigger = null;
   let bodyOverflowBeforeModal = "";
 
   function isPaymentReady() {
     return hasLivePaymentUrl(PAYMENT_CONFIG.paymentUrl);
   }
 
-  function getFocusableElements() {
-    return Array.from(modal.querySelectorAll(MODAL_FOCUSABLE_SELECTOR)).filter(
+  function getFocusableElementsWithin(container) {
+    return Array.from(container.querySelectorAll(MODAL_FOCUSABLE_SELECTOR)).filter(
       (node) => !node.disabled && isVisible(node)
     );
   }
@@ -159,6 +176,10 @@ export function initializeRoomSelector(root = document) {
   function clearInvalidStates() {
     Object.values(fieldMap).forEach((field) => {
       field.removeAttribute("aria-invalid");
+      const errorDiv = document.getElementById(`eekos-error-${field.name}`);
+      if (errorDiv) {
+        errorDiv.textContent = "";
+      }
     });
   }
 
@@ -172,7 +193,7 @@ export function initializeRoomSelector(root = document) {
     feedback.dataset.state = "error";
   }
 
-  function markInvalidField(fieldKey) {
+  function markInvalidField(fieldKey, message) {
     clearInvalidStates();
 
     if (!fieldKey) {
@@ -186,6 +207,12 @@ export function initializeRoomSelector(root = document) {
     }
 
     field.setAttribute("aria-invalid", "true");
+    
+    const errorDiv = document.getElementById(`eekos-error-${field.name}`);
+    if (errorDiv && message) {
+      errorDiv.textContent = message;
+    }
+    
     focusField(fieldKey);
   }
 
@@ -259,6 +286,98 @@ export function initializeRoomSelector(root = document) {
     summaryTotalRow.hidden = !isVisible;
     summaryDepositRow.hidden = !isVisible;
     summaryBalanceRow.hidden = !isVisible;
+  }
+
+  function buildDetailRateText(room) {
+    const displayRate = getRoomDisplayRate(room);
+
+    if (!displayRate) {
+      return ROOM_PRICING_TEXT.cardRateUnavailable;
+    }
+
+    return `From ${formatCurrency(displayRate, PAYMENT_CONFIG.currency)} / night`;
+  }
+
+  function setDetailMainImage(imageUrl, roomName, imageIndex) {
+    roomDetailMainImage.src = imageUrl || "";
+    roomDetailMainImage.alt = `${roomName} image ${imageIndex + 1}`;
+  }
+
+  function renderRoomDetail(room) {
+    const images = (room.images || []).filter(Boolean);
+    const specs = [
+      room.guestBand === "5+" ? "5+ guests" : `${room.guestBand} guests`,
+      room.beds,
+      `${room.size} sq m`
+    ];
+
+    roomDetailEyebrow.textContent = room.typeLabel;
+    roomDetailTitle.textContent = room.name;
+    roomDetailPrice.textContent = buildDetailRateText(room);
+    roomDetailDescription.textContent = room.description;
+    roomDetailInquire.setAttribute("href", INQUIRE_URL);
+
+    roomDetailSpecs.innerHTML = specs.map((item) => `<li>${item}</li>`).join("");
+    roomDetailTags.innerHTML = (room.tags || [])
+      .map((tag) => `<span class="eekos-room-tag">${tag}</span>`)
+      .join("");
+    roomDetailAmenities.innerHTML = (room.details || [])
+      .map((item) => `<li>${item}</li>`)
+      .join("");
+
+    if (!images.length) {
+      roomDetailMainImage.src = "";
+      roomDetailMainImage.alt = `${room.name} preview`;
+      roomDetailThumbs.innerHTML = "";
+      return;
+    }
+
+    setDetailMainImage(images[0], room.name, 0);
+    roomDetailThumbs.innerHTML = images.slice(0, 6).map((image, index) => `
+      <button
+        type="button"
+        class="eekos-room-thumb ${index === 0 ? "is-active" : ""}"
+        data-detail-image="${image}"
+        data-detail-index="${index}"
+        aria-label="Show ${room.name} image ${index + 1}"
+      >
+        <img src="${image}" alt="${room.name} thumbnail ${index + 1}">
+      </button>
+    `).join("");
+  }
+
+  function openRoomDetail(room, trigger) {
+    activeDetailRoom = room;
+    lastDetailFocusedTrigger = trigger || document.activeElement;
+    bodyOverflowBeforeModal = document.body.style.overflow;
+
+    renderRoomDetail(room);
+    roomDetailModal.hidden = false;
+    document.body.style.overflow = "hidden";
+
+    // Allow browser a frame to apply 'hidden = false' before adding animation class
+    requestAnimationFrame(() => {
+      roomDetailModal.classList.add("is-open");
+      roomDetailTitle.focus({ preventScroll: true });
+    });
+  }
+
+  function closeRoomDetail(restoreFocus = true) {
+    roomDetailModal.classList.remove("is-open");
+
+    // Wait for transition before hiding
+    setTimeout(() => {
+      if (!roomDetailModal.classList.contains("is-open")) {
+        roomDetailModal.hidden = true;
+      }
+    }, 300);
+
+    activeDetailRoom = null;
+    document.body.style.overflow = bodyOverflowBeforeModal;
+
+    if (restoreFocus && lastDetailFocusedTrigger && typeof lastDetailFocusedTrigger.focus === "function") {
+      lastDetailFocusedTrigger.focus();
+    }
   }
 
   function updateSummary() {
@@ -367,6 +486,27 @@ export function initializeRoomSelector(root = document) {
     roomList.innerHTML = renderRoomCards(rooms, INQUIRE_URL);
   }
 
+  function openBookingFromQuery() {
+    if (typeof window === "undefined") {
+      return;
+    }
+
+    const params = new URLSearchParams(window.location.search);
+    const roomId = params.get("book");
+
+    if (!roomId) {
+      return;
+    }
+
+    const room = roomLookup.get(roomId);
+
+    if (!room) {
+      return;
+    }
+
+    window.location.assign(`./booking.html?room=${encodeURIComponent(room.id)}`);
+  }
+
   function resetFormState() {
     bookingForm.reset();
     bookingForm.classList.remove("eekos-hidden");
@@ -380,6 +520,10 @@ export function initializeRoomSelector(root = document) {
   }
 
   function openModal(room, trigger) {
+    if (!roomDetailModal.hidden) {
+      closeRoomDetail(false);
+    }
+
     activeRoom = room;
     lastFocusedTrigger = trigger || document.activeElement;
     bodyOverflowBeforeModal = document.body.style.overflow;
@@ -391,13 +535,22 @@ export function initializeRoomSelector(root = document) {
     modal.hidden = false;
     document.body.style.overflow = "hidden";
     scrollModalToTop();
+
     requestAnimationFrame(() => {
+      modal.classList.add("is-open");
       checkinInput.focus({ preventScroll: true });
     });
   }
 
   function closeModal() {
-    modal.hidden = true;
+    modal.classList.remove("is-open");
+
+    setTimeout(() => {
+      if (!modal.classList.contains("is-open")) {
+        modal.hidden = true;
+      }
+    }, 300);
+
     activeRoom = null;
     document.body.style.overflow = bodyOverflowBeforeModal;
     clearFeedback();
@@ -423,8 +576,11 @@ export function initializeRoomSelector(root = document) {
         : { valid: true, message: "", field: "" };
 
     if (!result.valid) {
-      setFeedback(result.message);
-      markInvalidField(result.field);
+      if (result.field && fieldMap[result.field]) {
+        markInvalidField(result.field, result.message);
+      } else {
+        setFeedback(result.message);
+      }
       return false;
     }
 
@@ -444,41 +600,43 @@ export function initializeRoomSelector(root = document) {
   }
 
   function handleRoomListClick(event) {
-    const thumbButton = event.target.closest(".eekos-room-thumb");
+    const detailTrigger = event.target.closest("[data-open-room-detail]");
 
-    if (thumbButton && roomList.contains(thumbButton)) {
-      const roomId = thumbButton.getAttribute("data-room-id");
-      const image = thumbButton.getAttribute("data-image") || "";
-      const mainImage = roomList.querySelector(`[data-room-main="${roomId}"]`);
-
-      if (!mainImage) {
-        return;
-      }
-
-      mainImage.setAttribute("src", image);
-
-      roomList.querySelectorAll(`.eekos-room-thumb[data-room-id="${roomId}"]`).forEach((button) => {
-        button.classList.remove("is-active");
-      });
-
-      thumbButton.classList.add("is-active");
+    if (!detailTrigger || !roomList.contains(detailTrigger)) {
       return;
     }
 
-    const bookingButton = event.target.closest("[data-open-booking]");
-
-    if (!bookingButton || !roomList.contains(bookingButton)) {
-      return;
-    }
-
-    const roomId = bookingButton.getAttribute("data-open-booking") || "";
+    const roomId = detailTrigger.getAttribute("data-open-room-detail") || "";
     const room = roomLookup.get(roomId);
 
     if (!room) {
       return;
     }
 
-    openModal(room, bookingButton);
+    openRoomDetail(room, detailTrigger);
+  }
+
+  function handleRoomListKeydown(event) {
+    if (event.key !== "Enter" && event.key !== " ") {
+      return;
+    }
+
+    const detailTrigger = event.target.closest("[data-open-room-detail]");
+
+    if (!detailTrigger || !roomList.contains(detailTrigger)) {
+      return;
+    }
+
+    event.preventDefault();
+
+    const roomId = detailTrigger.getAttribute("data-open-room-detail") || "";
+    const room = roomLookup.get(roomId);
+
+    if (!room) {
+      return;
+    }
+
+    openRoomDetail(room, detailTrigger);
   }
 
   function clearFieldErrorOnEdit(event) {
@@ -486,6 +644,10 @@ export function initializeRoomSelector(root = document) {
 
     if (field.getAttribute("aria-invalid") === "true") {
       field.removeAttribute("aria-invalid");
+      const errorDiv = document.getElementById(`eekos-error-${field.name}`);
+      if (errorDiv) {
+        errorDiv.textContent = "";
+      }
       clearFeedback();
     }
   }
@@ -495,7 +657,7 @@ export function initializeRoomSelector(root = document) {
       return;
     }
 
-    const focusableElements = getFocusableElements();
+    const focusableElements = getFocusableElementsWithin(modal);
 
     if (!focusableElements.length) {
       return;
@@ -516,7 +678,34 @@ export function initializeRoomSelector(root = document) {
     }
   }
 
+  function trapRoomDetailFocus(event) {
+    if (event.key !== "Tab" || roomDetailModal.hidden) {
+      return;
+    }
+
+    const focusableElements = getFocusableElementsWithin(roomDetailModal);
+
+    if (!focusableElements.length) {
+      return;
+    }
+
+    const first = focusableElements[0];
+    const last = focusableElements[focusableElements.length - 1];
+
+    if (event.shiftKey && (document.activeElement === first || !roomDetailModal.contains(document.activeElement))) {
+      event.preventDefault();
+      last.focus();
+      return;
+    }
+
+    if (!event.shiftKey && document.activeElement === last) {
+      event.preventDefault();
+      first.focus();
+    }
+  }
+
   roomList.addEventListener("click", handleRoomListClick);
+  roomList.addEventListener("keydown", handleRoomListKeydown);
 
   guestButtons.forEach((button) => {
     button.addEventListener("click", () => {
@@ -577,6 +766,43 @@ export function initializeRoomSelector(root = document) {
   [fullNameInput, emailInput, phoneInput, arrivalInput, specialRequestsInput].forEach((field) => {
     field.addEventListener("input", clearFieldErrorOnEdit);
     field.addEventListener("change", clearFieldErrorOnEdit);
+  });
+
+  roomDetailClose.addEventListener("click", () => {
+    closeRoomDetail();
+  });
+
+  roomDetailModal.addEventListener("click", (event) => {
+    if (event.target === roomDetailModal) {
+      closeRoomDetail();
+    }
+  });
+
+  roomDetailBook.addEventListener("click", () => {
+    if (!activeDetailRoom) {
+      return;
+    }
+
+    const bookingTrigger = roomList.querySelector(`[data-open-room-detail="${activeDetailRoom.id}"]`) || roomDetailBook;
+    openModal(activeDetailRoom, bookingTrigger);
+  });
+
+  roomDetailThumbs.addEventListener("click", (event) => {
+    const thumb = event.target.closest("[data-detail-image]");
+
+    if (!thumb || !activeDetailRoom) {
+      return;
+    }
+
+    const imageUrl = thumb.getAttribute("data-detail-image") || "";
+    const imageIndex = Number(thumb.getAttribute("data-detail-index") || 0);
+    setDetailMainImage(imageUrl, activeDetailRoom.name, imageIndex);
+
+    roomDetailThumbs.querySelectorAll(".eekos-room-thumb").forEach((button) => {
+      button.classList.remove("is-active");
+    });
+
+    thumb.classList.add("is-active");
   });
 
   bookingForm.addEventListener("submit", (event) => {
@@ -643,16 +869,24 @@ export function initializeRoomSelector(root = document) {
   });
 
   document.addEventListener("keydown", (event) => {
-    if (modal.hidden) {
+    if (!modal.hidden) {
+      if (event.key === "Escape") {
+        closeModal();
+        return;
+      }
+
+      trapModalFocus(event);
       return;
     }
 
-    if (event.key === "Escape") {
-      closeModal();
-      return;
-    }
+    if (!roomDetailModal.hidden) {
+      if (event.key === "Escape") {
+        closeRoomDetail();
+        return;
+      }
 
-    trapModalFocus(event);
+      trapRoomDetailFocus(event);
+    }
   });
 
   syncDateInputMinimums(checkinInput, checkoutInput);
@@ -662,4 +896,5 @@ export function initializeRoomSelector(root = document) {
     ? ROOM_PRICING_TEXT.roomGuideLiveNote
     : ROOM_PRICING_TEXT.roomGuideNote;
   renderRooms();
+  openBookingFromQuery();
 }

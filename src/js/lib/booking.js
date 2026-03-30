@@ -84,3 +84,16 @@ export function getBookingFinancials({ room, checkin, checkout, paymentConfig })
 
   return { nights, rate, total, deposit, balance };
 }
+
+export function getBookingPreviewFinancials({ room, checkin, checkout, paymentConfig }) {
+  const nights = getNights(checkin, checkout);
+  const startingRate = getRoomStartingRate(room);
+  const referenceRate = getRoomReferenceRate(room);
+  const rate = getRoomDisplayRate(room);
+  const total = nights > 0 && rate > 0 ? nights * rate : 0;
+  const deposit = getDepositAmount(total, paymentConfig);
+  const balance = total > 0 ? Math.max(total - deposit, 0) : 0;
+  const rateSource = startingRate > 0 ? "live" : referenceRate > 0 ? "reference" : "none";
+
+  return { nights, rate, total, deposit, balance, rateSource };
+}

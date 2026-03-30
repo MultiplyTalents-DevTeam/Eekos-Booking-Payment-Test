@@ -1,0 +1,380 @@
+body {
+  margin: 0;
+  padding: clamp(12px, 2.2vw, 26px);
+  background:
+    radial-gradient(circle at 12% 0%, rgba(255, 255, 255, 0.58), transparent 48%),
+    radial-gradient(circle at 85% 0%, rgba(210, 184, 109, 0.22), transparent 42%),
+  #ece1d0;
+  color: #2f3b34;
+  font-family: Arial, sans-serif;
+  line-height: 1.5;
+  overflow-x: hidden;
+}
+
+#payment-page-app {
+  width: 100%;
+}
+
+#eekos-room-selector.eekos-payment-page-root {
+  max-width: 1320px;
+  margin: 0 auto;
+}
+
+#eekos-room-selector .eekos-payment-page-shell {
+  width: 100%;
+  display: grid;
+  gap: 16px;
+}
+
+#eekos-room-selector .eekos-booking-page-header {
+  padding-inline: 6px;
+}
+
+#eekos-room-selector .eekos-booking-page-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: #1f5c43;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  text-decoration: none;
+  transition: transform 0.2s ease, color 0.2s ease;
+}
+
+#eekos-room-selector .eekos-booking-page-back:hover {
+  color: #174933;
+  transform: translateX(-1px);
+}
+
+#eekos-room-selector .eekos-booking-page-back::before {
+  content: "<";
+  font-size: 14px;
+}
+
+#eekos-room-selector .eekos-payment-stage {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+
+#eekos-room-selector .eekos-payment-stage span {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 38px;
+  padding: 8px 14px;
+  border: 1px solid rgba(216, 206, 192, 0.86);
+  border-radius: 999px;
+  background: rgba(255, 252, 246, 0.72);
+  color: #8a7557;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+#eekos-room-selector .eekos-payment-stage .is-active {
+  background: #1f5c43;
+  border-color: #1f5c43;
+  color: #ffffff;
+}
+
+#eekos-room-selector .eekos-payment-stage .is-complete {
+  color: #1f5c43;
+}
+
+#eekos-room-selector .eekos-payment-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 250px;
+  gap: 18px;
+  align-items: end;
+  padding: 24px;
+  border: 1px solid rgba(216, 206, 192, 0.92);
+  border-radius: 28px;
+  background:
+    radial-gradient(circle at top right, rgba(255, 255, 255, 0.62), transparent 42%),
+    linear-gradient(180deg, rgba(247, 242, 234, 0.96) 0%, rgba(244, 238, 228, 0.92) 100%);
+  box-shadow: 0 20px 48px rgba(9, 15, 11, 0.12);
+  margin-bottom: 18px;
+}
+
+#eekos-room-selector .eekos-payment-hero-copy .eekos-booking-title {
+  margin-bottom: 10px;
+}
+
+#eekos-room-selector .eekos-payment-reference-card {
+  padding: 18px;
+  border: 1px solid rgba(216, 206, 192, 0.92);
+  border-radius: 22px;
+  background: rgba(255, 252, 245, 0.78);
+  display: grid;
+  gap: 6px;
+}
+
+#eekos-room-selector .eekos-payment-reference-card span {
+  color: #6d8a73;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+#eekos-room-selector .eekos-payment-reference-card strong {
+  color: #173629;
+  font-family: "Nano Sans Georgian", Georgia, serif;
+  font-size: 24px;
+  line-height: 1.05;
+  overflow-wrap: anywhere;
+}
+
+#eekos-room-selector .eekos-payment-reference-card small {
+  color: #8f7a5d;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+#eekos-room-selector .eekos-payment-stay-card,
+#eekos-room-selector .eekos-payment-pricing-card,
+#eekos-room-selector .eekos-payment-detail-card {
+  border: 1px solid rgba(216, 206, 192, 0.92);
+  border-radius: 24px;
+  background: rgba(255, 252, 245, 0.9);
+  box-shadow: 0 16px 38px rgba(23, 54, 41, 0.08);
+}
+
+#eekos-room-selector .eekos-payment-stay-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(340px, 0.9fr);
+  gap: 18px;
+  align-items: center;
+  padding: 22px 24px;
+  margin-bottom: 18px;
+}
+
+#eekos-room-selector .eekos-payment-stay-main .eekos-summary-highlight {
+  max-width: none;
+  margin-bottom: 6px;
+}
+
+#eekos-room-selector .eekos-payment-stay-main .eekos-summary-copy {
+  margin-bottom: 0;
+  max-width: none;
+}
+
+#eekos-room-selector .eekos-payment-stay-facts {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+#eekos-room-selector .eekos-payment-stay-facts div,
+#eekos-room-selector .eekos-payment-pricing-grid div {
+  padding: 14px 16px;
+  border: 1px solid rgba(216, 206, 192, 0.84);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.56);
+}
+
+#eekos-room-selector .eekos-payment-stay-facts span,
+#eekos-room-selector .eekos-payment-pricing-grid span {
+  display: block;
+  margin-bottom: 6px;
+  color: #7d6a4f;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+#eekos-room-selector .eekos-payment-stay-facts strong,
+#eekos-room-selector .eekos-payment-pricing-grid strong {
+  color: #173629;
+  font-size: 14px;
+  line-height: 1.45;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+#eekos-room-selector .eekos-payment-pricing-card {
+  padding: 24px;
+  margin-bottom: 18px;
+  background:
+    radial-gradient(circle at top right, rgba(255, 255, 255, 0.72), transparent 42%),
+    linear-gradient(180deg, rgba(251, 246, 238, 0.98) 0%, rgba(244, 237, 227, 0.96) 100%);
+}
+
+#eekos-room-selector .eekos-payment-pricing-top {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(320px, 0.9fr);
+  gap: 18px;
+  align-items: start;
+}
+
+#eekos-room-selector .eekos-payment-pricing-total {
+  margin: 0 0 10px;
+  color: #173629;
+  font-family: "Nano Sans Georgian", Georgia, serif;
+  font-size: clamp(36px, 4vw, 58px);
+  line-height: 0.96;
+  font-weight: 700;
+}
+
+#eekos-room-selector .eekos-payment-pricing-copy {
+  margin: 0;
+  max-width: 42ch;
+  color: #7d6a4f;
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+#eekos-room-selector .eekos-payment-pricing-grid {
+  display: grid;
+  gap: 12px;
+}
+
+#eekos-room-selector .eekos-payment-trust-points {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+#eekos-room-selector .eekos-payment-trust-points span {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 38px;
+  padding: 8px 14px;
+  border: 1px solid rgba(216, 206, 192, 0.86);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.68);
+  color: #5d6f60;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+#eekos-room-selector .eekos-payment-actions {
+  margin-top: 20px;
+}
+
+#eekos-room-selector .eekos-payment-actions .eekos-btn {
+  min-height: 48px;
+  padding: 12px 18px;
+  font-size: 13px;
+  letter-spacing: 0.06em;
+}
+
+#eekos-room-selector .eekos-summary-copy--full {
+  margin-bottom: 0;
+  max-width: none;
+  white-space: pre-wrap;
+}
+
+#eekos-room-selector .eekos-payment-detail-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+}
+
+#eekos-room-selector .eekos-payment-detail-card {
+  padding: 20px;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.62);
+}
+
+#eekos-room-selector .eekos-payment-policy-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 12px;
+}
+
+#eekos-room-selector .eekos-payment-policy-list li {
+  position: relative;
+  padding-left: 14px;
+  color: #7c6b56;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+#eekos-room-selector .eekos-payment-policy-list li::before {
+  content: "";
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #d0b86d;
+  position: absolute;
+  left: 0;
+  top: 0.55em;
+}
+
+#eekos-room-selector .eekos-payment-empty {
+  border: 1px solid var(--eekos-border);
+  border-radius: 22px;
+  background: var(--eekos-card);
+  padding: 24px;
+}
+
+@media (max-width: 1100px) {
+  #eekos-room-selector .eekos-payment-hero,
+  #eekos-room-selector .eekos-payment-stay-card,
+  #eekos-room-selector .eekos-payment-pricing-top,
+  #eekos-room-selector .eekos-payment-detail-grid {
+    grid-template-columns: 1fr;
+  }
+
+  #eekos-room-selector .eekos-payment-stay-facts {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 767px) {
+  body {
+    padding: 0;
+  }
+
+  #eekos-room-selector .eekos-booking-page-header {
+    padding: 14px 14px 0;
+  }
+
+  #eekos-room-selector .eekos-payment-stage {
+    padding: 0 14px;
+  }
+
+  #eekos-room-selector .eekos-payment-hero,
+  #eekos-room-selector .eekos-payment-stay-card,
+  #eekos-room-selector .eekos-payment-pricing-card,
+  #eekos-room-selector .eekos-payment-detail-card {
+    border-radius: 0;
+    border-left: 0;
+    border-right: 0;
+    box-shadow: none;
+  }
+
+  #eekos-room-selector .eekos-payment-hero,
+  #eekos-room-selector .eekos-payment-stay-card,
+  #eekos-room-selector .eekos-payment-pricing-card,
+  #eekos-room-selector .eekos-payment-detail-card {
+    padding: 18px 14px;
+  }
+
+  #eekos-room-selector .eekos-payment-reference-card {
+    padding: 14px;
+  }
+
+  #eekos-room-selector .eekos-payment-pricing-total {
+    font-size: clamp(32px, 10vw, 46px);
+  }
+
+  #eekos-room-selector .eekos-payment-trust-points {
+    gap: 8px;
+  }
+
+  #eekos-room-selector .eekos-payment-trust-points span {
+    width: 100%;
+    justify-content: flex-start;
+  }
+}

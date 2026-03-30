@@ -4,6 +4,7 @@ import assert from "node:assert/strict";
 import {
   buildGuestSummary,
   getBookingFinancials,
+  getBookingPreviewFinancials,
   getDepositAmount,
   getRoomDisplayRate,
   getNights,
@@ -42,6 +43,21 @@ test("getRoomReferenceRate returns public display rates without affecting billab
   assert.equal(getRoomStartingRate({ fromRate: 3250, startingRate: 0 }), 0);
   assert.equal(getRoomDisplayRate({ fromRate: 3250, startingRate: 0 }), 3250);
   assert.equal(getRoomDisplayRate({ fromRate: 3250, startingRate: 4100 }), 4100);
+});
+
+test("getBookingPreviewFinancials can estimate from a reference rate guide", () => {
+  const financials = getBookingPreviewFinancials({
+    room: { fromRate: 3850, startingRate: 0 },
+    checkin: "2026-05-01",
+    checkout: "2026-05-03",
+    paymentConfig: { depositType: "percentage", depositValue: 30 }
+  });
+
+  assert.equal(financials.rate, 3850);
+  assert.equal(financials.total, 7700);
+  assert.equal(financials.deposit, 2310);
+  assert.equal(financials.balance, 5390);
+  assert.equal(financials.rateSource, "reference");
 });
 
 test("buildGuestSummary formats adults and children cleanly", () => {

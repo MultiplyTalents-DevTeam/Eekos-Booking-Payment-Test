@@ -29,6 +29,45 @@ export const roomSelectorTemplate = `
     <div class="eekos-room-list" id="eekos-room-list"></div>
   </div>
 
+  <div class="eekos-room-detail-modal" id="eekos-room-detail-modal" hidden>
+    <div class="eekos-room-detail-dialog" role="dialog" aria-modal="true" aria-labelledby="eekos-room-detail-title">
+      <button
+        type="button"
+        class="eekos-room-detail-close"
+        id="eekos-room-detail-close"
+        aria-label="Close room details"
+      >&times;</button>
+
+      <div class="eekos-room-detail-layout">
+        <div class="eekos-room-detail-media">
+          <img id="eekos-room-detail-main-image" src="" alt="Room preview">
+          <div class="eekos-room-detail-thumbs" id="eekos-room-detail-thumbs"></div>
+        </div>
+
+        <div class="eekos-room-detail-content">
+          <p class="eekos-room-detail-eyebrow" id="eekos-room-detail-eyebrow">Room type</p>
+          <h3 class="eekos-room-detail-title" id="eekos-room-detail-title" tabindex="-1">Room</h3>
+          <p class="eekos-room-detail-price" id="eekos-room-detail-price">From rate</p>
+
+          <ul class="eekos-room-detail-specs" id="eekos-room-detail-specs"></ul>
+          <p class="eekos-room-detail-description" id="eekos-room-detail-description"></p>
+
+          <div class="eekos-room-detail-tags" id="eekos-room-detail-tags"></div>
+
+          <div class="eekos-room-detail-amenities-wrap">
+            <p class="eekos-room-details-title">Room details</p>
+            <ul class="eekos-room-detail-amenities" id="eekos-room-detail-amenities"></ul>
+          </div>
+
+          <div class="eekos-room-detail-actions">
+            <button type="button" class="eekos-btn eekos-btn--primary" id="eekos-room-detail-book">Check dates &amp; price</button>
+            <a class="eekos-btn eekos-btn--secondary" id="eekos-room-detail-inquire" href="#inquire">Inquire</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div class="eekos-booking-modal" id="eekos-booking-modal" hidden>
     <div class="eekos-booking-dialog" role="dialog" aria-modal="true" aria-labelledby="eekos-booking-title">
       <div class="eekos-booking-main">
@@ -57,11 +96,13 @@ export const roomSelectorTemplate = `
               <div class="eekos-field">
                 <label for="eekos-checkin">Check-in</label>
                 <input type="date" id="eekos-checkin" name="checkin" required>
+                <div class="eekos-field-error" id="eekos-error-checkin" aria-live="polite"></div>
               </div>
 
               <div class="eekos-field">
                 <label for="eekos-checkout">Check-out</label>
                 <input type="date" id="eekos-checkout" name="checkout" required>
+                <div class="eekos-field-error" id="eekos-error-checkout" aria-live="polite"></div>
               </div>
 
               <div class="eekos-field">
@@ -74,6 +115,7 @@ export const roomSelectorTemplate = `
                   <option value="5">5 adults</option>
                   <option value="6">6 adults</option>
                 </select>
+                <div class="eekos-field-error" id="eekos-error-adults" aria-live="polite"></div>
               </div>
 
               <div class="eekos-field">
@@ -85,6 +127,7 @@ export const roomSelectorTemplate = `
                   <option value="3">3 children</option>
                   <option value="4">4 children</option>
                 </select>
+                <div class="eekos-field-error" id="eekos-error-children" aria-live="polite"></div>
               </div>
 
               <div class="eekos-field eekos-field--full">
@@ -95,6 +138,7 @@ export const roomSelectorTemplate = `
                   maxlength="500"
                   placeholder="Arrival time, bed preference, accessibility notes, or any special request."
                 ></textarea>
+                <div class="eekos-field-error" id="eekos-error-special_requests" aria-live="polite"></div>
               </div>
             </div>
 
@@ -143,21 +187,25 @@ export const roomSelectorTemplate = `
               <div class="eekos-field">
                 <label for="eekos-full-name">Full name</label>
                 <input type="text" id="eekos-full-name" name="full_name" autocomplete="name" autocapitalize="words" maxlength="120" required>
+                <div class="eekos-field-error" id="eekos-error-full_name" aria-live="polite"></div>
               </div>
 
               <div class="eekos-field">
                 <label for="eekos-email">Email address</label>
                 <input type="email" id="eekos-email" name="email" autocomplete="email" inputmode="email" maxlength="160" required>
+                <div class="eekos-field-error" id="eekos-error-email" aria-live="polite"></div>
               </div>
 
               <div class="eekos-field">
                 <label for="eekos-phone">Phone number</label>
                 <input type="tel" id="eekos-phone" name="phone" autocomplete="tel" inputmode="tel" maxlength="32" required>
+                <div class="eekos-field-error" id="eekos-error-phone" aria-live="polite"></div>
               </div>
 
               <div class="eekos-field">
                 <label for="eekos-arrival-time">Estimated arrival time</label>
                 <input type="text" id="eekos-arrival-time" name="arrival_time" maxlength="40" placeholder="Example: 3:00 PM">
+                <div class="eekos-field-error" id="eekos-error-arrival_time" aria-live="polite"></div>
               </div>
             </div>
 
