@@ -51,13 +51,18 @@ function html(reference, room) {
 }
 
 export default function handler(req, res) {
-  if (req.method !== "GET") {
-    res.setHeader("Allow", "GET");
+  if (req.method !== "GET" && req.method !== "HEAD") {
+    res.setHeader("Allow", "GET, HEAD");
     return res.status(405).json({ ok: false, error: "Method not allowed" });
   }
 
   const reference = cleanValue(req.query?.reference, 120);
   const room = cleanValue(req.query?.room, 120);
+
+  if (req.method === "HEAD") {
+    return res.status(200).end();
+  }
+
   res.setHeader("Content-Type", "text/html; charset=utf-8");
   return res.status(200).send(html(reference, room));
 }
