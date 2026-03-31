@@ -19,10 +19,57 @@ function parseWantedKeys(input) {
     .filter(Boolean);
 }
 
+function normalizeField(field, fallbackKey = null) {
+  return {
+    id: field?.id || field?._id || field?.fieldId || null,
+    name: field?.name || field?.label || field?.title || fallbackKey || null,
+    key: field?.fieldKey || field?.key || field?.slug || fallbackKey,
+    type: field?.type || field?.dataType || field?.fieldType || null,
+    options: field?.options || field?.values || field?.enum || null
+  };
+}
+
+function normalizeLocationFields(payload) {
+  const fields = payload?.customFields || payload?.fields || payload?.data?.customFields || payload?.data?.fields || [];
+
+  return Array.isArray(fields)
+    ? fields.map((field) => normalizeField(field))
+    : [];
+}
+
+function normalizeObjectSchemaFields(payload) {
+  const candidates = [
+    payload?.fields,
+    payload?.schema?.fields,
+    payload?.data?.fields,
+    payload?.data?.schema?.fields,
+    payload?.object?.fields
+  ];
+
+  const matchedArray = candidates.find((value) => Array.isArray(value));
+
+  if (matchedArray) {
+    return matchedArray.map((field) => normalizeField(field));
+  }
+
+  const propertyBag = payload?.properties
+    || payload?.schema?.properties
+    || payload?.data?.properties
+    || payload?.data?.schema?.properties
+    || null;
+
+  if (!propertyBag || typeof propertyBag !== "object") {
+    return [];
+  }
+
+  return Object.entries(propertyBag).map(([key, value]) => normalizeField(value, key));
+}
+
 export default async function handler(req, res) {
   try {
     const token = process.env.GHL_ACCESS_TOKEN;
     const locationId = process.env.GHL_LOCATION_ID;
+    const objectKey = req.query?.object ? String(req.query.object).trim() : "";
 
     if (!token) {
       return res.status(500).json({ ok: false, error: "Missing GHL_ACCESS_TOKEN" });
@@ -33,8 +80,11 @@ export default async function handler(req, res) {
     }
 
     const wantedKeys = parseWantedKeys(req.query?.keys || process.env.GHL_WANTED_FIELD_KEYS);
+    const url = objectKey
+      ? `${GHL_BASE_URL}/objects/${encodeURIComponent(objectKey)}`
+      : `${GHL_BASE_URL}/locations/${locationId}/customFields`;
 
-    const response = await fetch(`${GHL_BASE_URL}/locations/${locationId}/customFields`, {
+    const response = await fetch(url, {
       method: "GET",
       headers: {
         Authorization: `Bearer ${token}`,
@@ -61,16 +111,9 @@ export default async function handler(req, res) {
       });
     }
 
-    const fields = json?.customFields || json?.fields || json?.data?.customFields || json?.data?.fields || [];
-    const normalizedFields = Array.isArray(fields)
-      ? fields.map((field) => ({
-        id: field?.id || field?._id || null,
-        name: field?.name || null,
-        key: field?.fieldKey || field?.key || null,
-        type: field?.type || null,
-        options: field?.options || field?.values || null
-      }))
-      : [];
+    const normalizedFields = objectKey
+      ? normalizeObjectSchemaFields(json)
+      : normalizeLocationFields(json);
 
     const matches = wantedKeys.length
       ? normalizedFields.filter((field) => wantedKeys.includes(field.key))
@@ -79,6 +122,8 @@ export default async function handler(req, res) {
     return res.status(200).json({
       ok: true,
       locationId,
+      source: objectKey ? "object_schema" : "location_custom_fields",
+      objectKey: objectKey || null,
       wantedKeys,
       found: matches.length,
       totalCustomFields: normalizedFields.length,

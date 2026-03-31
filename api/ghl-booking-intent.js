@@ -110,8 +110,43 @@ async function fetchGhl(path, token, method, payload) {
 }
 
 export default async function handler(req, res) {
+  if (req.method === "GET") {
+    const config = resolveGhlConfig(process.env);
+
+    return json(res, 200, {
+      ok: true,
+      route: "ghl-booking-intent",
+      mode: "inspect_only",
+      message: "Use POST to create a booking intent in GHL. A browser visit uses GET, so this route will not create a contact or opportunity.",
+      requiredEnv: {
+        GHL_ACCESS_TOKEN: Boolean(process.env.GHL_ACCESS_TOKEN),
+        GHL_LOCATION_ID: Boolean(process.env.GHL_LOCATION_ID),
+        GHL_RESERVATIONS_PIPELINE_ID: hasLiveGhlId(config.pipeline.reservationsPipelineId),
+        GHL_STAGE_WAITING_FOR_PAYMENT_ID: hasLiveGhlId(config.pipeline.stages.waitingForPaymentStageId)
+      },
+      expectedBodyFields: [
+        "roomId",
+        "roomName",
+        "checkin",
+        "checkout",
+        "adults",
+        "children",
+        "fullName",
+        "email",
+        "phone",
+        "arrivalTime",
+        "specialRequests",
+        "reference",
+        "total",
+        "deposit",
+        "balance",
+        "createdAt"
+      ]
+    });
+  }
+
   if (req.method !== "POST") {
-    res.setHeader("Allow", "POST");
+    res.setHeader("Allow", "GET, POST");
     return json(res, 405, { ok: false, error: "Method not allowed" });
   }
 
