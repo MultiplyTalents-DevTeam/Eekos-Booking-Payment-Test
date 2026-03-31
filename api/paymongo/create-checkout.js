@@ -185,14 +185,12 @@ function buildRetryReference(reference) {
 }
 
 function isRedirectUrlError(checkoutResult) {
-  if (checkoutResult?.status !== 400 && checkoutResult?.status !== 404) {
-    return false;
-  }
-
   const detail = extractPaymongoErrorText(checkoutResult.body).toLowerCase();
   return detail.includes("success_url")
     || detail.includes("cancel_url")
-    || detail.includes("received non-200 response");
+    || detail.includes("received non-200 response")
+    || detail.includes("non-200 response")
+    || detail.includes("redirect");
 }
 
 function buildCheckoutRedirectUrls(successUrl, cancelUrl, booking, room) {
@@ -207,6 +205,22 @@ function buildCheckoutRedirectUrls(successUrl, cancelUrl, booking, room) {
       room: room.id,
       opportunity: booking.ghlOpportunityId
     })
+  };
+}
+
+function buildHostedReturnUrls(baseUrl) {
+  const normalizedBase = cleanString(baseUrl, 240).replace(/\/+$/, "");
+
+  if (!normalizedBase) {
+    return {
+      successUrl: "",
+      cancelUrl: ""
+    };
+  }
+
+  return {
+    successUrl: `${normalizedBase}/api/paymongo/return-success`,
+    cancelUrl: `${normalizedBase}/api/paymongo/return-cancelled`
   };
 }
 
@@ -352,6 +366,51 @@ export default async function handler(req, res) {
           cancelUrl = fallbackRedirects.cancelUrl;
           attemptedRedirects.push({
             source: "request_origin_fallback",
+            successUrl,
+            cancelUrl
+          });
+
+          paymongoPayload = buildPaymongoCheckoutPayload({
+            booking,
+            room,
+            financials,
+            paymongoConfig,
+            successUrl,
+            cancelUrl
+          });
+
+          checkoutResult = await fetchPaymongoJson(
+            resolvePaymongoCheckoutRoute(),
+            paymongoConfig.secretKey,
+            {
+              method: "POST",
+              body: JSON.stringify(paymongoPayload)
+            }
+          );
+        }
+      }
+    }
+
+    if (!checkoutResult.ok && isRedirectUrlError(checkoutResult)) {
+      const requestBaseUrl = resolveRequestBaseUrl(req);
+      const hostedReturns = buildHostedReturnUrls(requestBaseUrl);
+
+      if (hostedReturns.successUrl && hostedReturns.cancelUrl) {
+        const hostedRedirects = buildCheckoutRedirectUrls(
+          hostedReturns.successUrl,
+          hostedReturns.cancelUrl,
+          booking,
+          room
+        );
+
+        if (
+          hostedRedirects.successUrl !== successUrl
+          || hostedRedirects.cancelUrl !== cancelUrl
+        ) {
+          successUrl = hostedRedirects.successUrl;
+          cancelUrl = hostedRedirects.cancelUrl;
+          attemptedRedirects.push({
+            source: "api_hosted_return_fallback",
             successUrl,
             cancelUrl
           });
