@@ -41,6 +41,28 @@ test("resolveGhlConfig prefers env vars over placeholder file values", () => {
   assert.equal(resolved.customFields.roomNameFieldId, "field_env");
 });
 
+test("resolveGhlConfig accepts quoted values and fallback alias env names", () => {
+  const resolved = resolveGhlConfig({
+    GHL_RESERVATION_PIPELINE_ID: "\"pipe_alias\"",
+    GHL_STAGE_WAITING_PAYMENT_ID: "'stage_alias'"
+  }, {
+    locationId: "__SET_GHL_LOCATION_ID__",
+    calendars: {
+      masterCalendarId: "cal_file"
+    },
+    pipeline: {
+      reservationsPipelineId: "__SET_GHL_RESERVATIONS_PIPELINE_ID__",
+      stages: {
+        waitingForPaymentStageId: "__SET_GHL_STAGE_WAITING_FOR_PAYMENT_ID__"
+      }
+    },
+    customFields: {}
+  });
+
+  assert.equal(resolved.pipeline.reservationsPipelineId, "pipe_alias");
+  assert.equal(resolved.pipeline.stages.waitingForPaymentStageId, "stage_alias");
+});
+
 test("collectMissingGhlConfigPaths returns nested placeholder paths", () => {
   const result = collectMissingGhlConfigPaths({
     locationId: "loc_123",

@@ -29,7 +29,7 @@ function toInteger(value) {
 }
 
 export function resolveInboundWebhookUrl(env = process.env) {
-  return cleanString(env.GHL_INBOUND_WEBHOOK_URL || env.GHL_WEBHOOK_URL, 2000);
+  return cleanString(env.GHL_INBOUND_WEBHOOK_URL || env.GHL_WEBHOOK_URL || env.GHL_WEBHOOK_UR, 2000);
 }
 
 export function buildBookingIntentAutomationPayload({
