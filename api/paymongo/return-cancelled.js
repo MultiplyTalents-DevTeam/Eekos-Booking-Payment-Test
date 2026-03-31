@@ -51,15 +51,23 @@ function html(reference, room) {
 }
 
 export default function handler(req, res) {
-  if (req.method !== "GET" && req.method !== "HEAD") {
-    res.setHeader("Allow", "GET, HEAD");
+  if (req.method !== "GET" && req.method !== "HEAD" && req.method !== "OPTIONS") {
+    res.setHeader("Allow", "GET, HEAD, OPTIONS");
     return res.status(405).json({ ok: false, error: "Method not allowed" });
   }
 
   const reference = cleanValue(req.query?.reference, 120);
   const room = cleanValue(req.query?.room, 120);
 
+  res.setHeader("Cache-Control", "no-store, no-cache, must-revalidate, proxy-revalidate");
+  res.setHeader("Pragma", "no-cache");
+  res.setHeader("Expires", "0");
+
   if (req.method === "HEAD") {
+    return res.status(200).end();
+  }
+
+  if (req.method === "OPTIONS") {
     return res.status(200).end();
   }
 

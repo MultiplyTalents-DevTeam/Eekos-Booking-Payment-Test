@@ -194,16 +194,20 @@ function isRedirectUrlError(checkoutResult) {
 }
 
 function buildCheckoutRedirectUrls(successUrl, cancelUrl, booking, room) {
+  const callbackToken = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+
   return {
     successUrl: appendQueryParams(successUrl, {
       reference: booking.reference,
       room: room.id,
-      opportunity: booking.ghlOpportunityId
+      opportunity: booking.ghlOpportunityId,
+      cb: callbackToken
     }),
     cancelUrl: appendQueryParams(cancelUrl, {
       reference: booking.reference,
       room: room.id,
-      opportunity: booking.ghlOpportunityId
+      opportunity: booking.ghlOpportunityId,
+      cb: callbackToken
     })
   };
 }
