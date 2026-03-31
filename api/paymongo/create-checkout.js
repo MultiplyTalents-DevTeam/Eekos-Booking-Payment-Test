@@ -10,6 +10,11 @@ import {
   resolvePaymongoConfig
 } from "../_lib/paymongo.js";
 import {
+  buildHostedReturnUrls as buildHostedReturnUrlsForBase,
+  resolveRequestBaseUrl,
+  resolveVercelProductionBaseUrl
+} from "../_lib/paymongo-callback-url.js";
+import {
   buildPaymentAutomationPayload,
   dispatchInboundWebhook,
   resolveInboundWebhookUrl
@@ -49,23 +54,6 @@ function cleanString(value, maxLength = 500) {
     .replace(/\s+/g, " ")
     .trim()
     .slice(0, maxLength);
-}
-
-function firstHeaderValue(value) {
-  return cleanString(Array.isArray(value) ? value[0] : String(value || "").split(",")[0], 240);
-}
-
-function resolveRequestBaseUrl(req) {
-  const forwardedProto = firstHeaderValue(req?.headers?.["x-forwarded-proto"]);
-  const forwardedHost = firstHeaderValue(req?.headers?.["x-forwarded-host"]);
-  const host = forwardedHost || firstHeaderValue(req?.headers?.host);
-  const protocol = forwardedProto || (host.includes("localhost") ? "http" : "https");
-
-  if (!host) {
-    return "";
-  }
-
-  return `${protocol}://${host}`;
 }
 
 function normalizeRoomToken(value) {
@@ -212,31 +200,6 @@ function buildCheckoutRedirectUrls(successUrl, cancelUrl, booking, room) {
   };
 }
 
-function buildHostedReturnUrls(baseUrl) {
-  const normalizedBase = cleanString(baseUrl, 240).replace(/\/+$/, "");
-
-  if (!normalizedBase) {
-    return {
-      successUrl: "",
-      cancelUrl: ""
-    };
-  }
-
-  return {
-    successUrl: `${normalizedBase}/api/paymongo/return-success`,
-    cancelUrl: `${normalizedBase}/api/paymongo/return-cancelled`
-  };
-}
-
-function resolveVercelProductionBaseUrl(env = process.env) {
-  const projectProductionHost = cleanString(env.VERCEL_PROJECT_PRODUCTION_URL, 240);
-  if (projectProductionHost) {
-    return `https://${projectProductionHost.replace(/^https?:\/\//i, "")}`;
-  }
-
-  return "";
-}
-
 export default async function handler(req, res) {
   if (req.method === "GET") {
     const config = resolvePaymongoConfig(process.env, PAYMENT_CONFIG);
@@ -360,7 +323,7 @@ export default async function handler(req, res) {
 
     if (!checkoutResult.ok && isRedirectUrlError(checkoutResult)) {
       const productionBaseUrl = resolveVercelProductionBaseUrl(process.env);
-      const productionHostedReturns = buildHostedReturnUrls(productionBaseUrl);
+      const productionHostedReturns = buildHostedReturnUrlsForBase(productionBaseUrl);
 
       if (productionHostedReturns.successUrl && productionHostedReturns.cancelUrl) {
         const productionRedirects = buildCheckoutRedirectUrls(
@@ -451,7 +414,7 @@ export default async function handler(req, res) {
 
     if (!checkoutResult.ok && isRedirectUrlError(checkoutResult)) {
       const requestBaseUrl = resolveRequestBaseUrl(req);
-      const hostedReturns = buildHostedReturnUrls(requestBaseUrl);
+      const hostedReturns = buildHostedReturnUrlsForBase(requestBaseUrl);
 
       if (hostedReturns.successUrl && hostedReturns.cancelUrl) {
         const hostedRedirects = buildCheckoutRedirectUrls(
@@ -525,13 +488,21 @@ export default async function handler(req, res) {
 
     if (!checkoutResult.ok) {
       const detail = extractPaymongoErrorText(checkoutResult.body);
+      console.error("[paymongo:create-checkout] create_failed", {
+        status: checkoutResult.status,
+        statusText: checkoutResult.statusText,
+        detail,
+        attemptedRedirects
+      });
+
       return json(res, 502, {
         ok: false,
         error: detail ? `PayMongo checkout error: ${detail}` : "Unable to create PayMongo checkout session.",
         status: checkoutResult.status,
         statusText: checkoutResult.statusText,
         body: checkoutResult.body,
-        attemptedRedirects
+        attemptedRedirects,
+        debugHelper: "/api/paymongo/debug-helper"
       });
     }
 
