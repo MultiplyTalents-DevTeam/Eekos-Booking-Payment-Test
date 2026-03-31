@@ -51,8 +51,8 @@ function html(reference, room) {
 }
 
 export default function handler(req, res) {
-  if (req.method !== "GET" && req.method !== "HEAD" && req.method !== "OPTIONS") {
-    res.setHeader("Allow", "GET, HEAD, OPTIONS");
+  if (req.method !== "GET" && req.method !== "HEAD" && req.method !== "OPTIONS" && req.method !== "POST") {
+    res.setHeader("Allow", "GET, HEAD, OPTIONS, POST");
     return res.status(405).json({ ok: false, error: "Method not allowed" });
   }
 
@@ -69,6 +69,10 @@ export default function handler(req, res) {
 
   if (req.method === "OPTIONS") {
     return res.status(200).end();
+  }
+
+  if (req.method === "POST") {
+    return res.status(200).json({ ok: true, route: "paymongo-return-success" });
   }
 
   res.setHeader("Content-Type", "text/html; charset=utf-8");

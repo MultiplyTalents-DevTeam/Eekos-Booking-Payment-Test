@@ -200,6 +200,13 @@ function buildCheckoutRedirectUrls(successUrl, cancelUrl, booking, room) {
   };
 }
 
+function buildPlainRedirectUrls(successUrl, cancelUrl) {
+  return {
+    successUrl: cleanString(successUrl, 600),
+    cancelUrl: cleanString(cancelUrl, 600)
+  };
+}
+
 function buildCheckoutDebugContext({
   room,
   booking,
@@ -430,6 +437,42 @@ export default async function handler(req, res) {
             }
           );
         }
+      }
+    }
+
+    if (!checkoutResult.ok && isRedirectUrlError(checkoutResult)) {
+      const plainRedirects = buildPlainRedirectUrls(successUrl.split("?")[0], cancelUrl.split("?")[0]);
+
+      if (
+        plainRedirects.successUrl
+        && plainRedirects.cancelUrl
+        && (plainRedirects.successUrl !== successUrl || plainRedirects.cancelUrl !== cancelUrl)
+      ) {
+        successUrl = plainRedirects.successUrl;
+        cancelUrl = plainRedirects.cancelUrl;
+        attemptedRedirects.push({
+          source: "plain_no_query_fallback",
+          successUrl,
+          cancelUrl
+        });
+
+        paymongoPayload = buildPaymongoCheckoutPayload({
+          booking,
+          room,
+          financials,
+          paymongoConfig,
+          successUrl,
+          cancelUrl
+        });
+
+        checkoutResult = await fetchPaymongoJson(
+          resolvePaymongoCheckoutRoute(),
+          paymongoConfig.secretKey,
+          {
+            method: "POST",
+            body: JSON.stringify(paymongoPayload)
+          }
+        );
       }
     }
 
