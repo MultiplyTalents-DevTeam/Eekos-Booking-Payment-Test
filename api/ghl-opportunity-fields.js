@@ -1,9 +1,11 @@
 import {
   fetchGhlJson,
-  normalizeLocationFields,
+  normalizeObjectSchemaFields,
   parseCommaSeparatedValues,
   readGhlCredentials
 } from "./_lib/ghl-route-utils.js";
+
+const OPPORTUNITY_OBJECT_KEY = "opportunity";
 
 export default async function handler(req, res) {
   try {
@@ -17,8 +19,8 @@ export default async function handler(req, res) {
       return res.status(500).json({ ok: false, error: "Missing GHL_LOCATION_ID" });
     }
 
-    const wantedKeys = parseCommaSeparatedValues(req.query?.keys || process.env.GHL_WANTED_FIELD_KEYS);
-    const result = await fetchGhlJson(`/locations/${locationId}/customFields`, token, {
+    const wantedKeys = parseCommaSeparatedValues(req.query?.keys || process.env.GHL_WANTED_OPPORTUNITY_FIELD_KEYS);
+    const result = await fetchGhlJson(`/objects/${OPPORTUNITY_OBJECT_KEY}`, token, {
       method: "GET"
     });
 
@@ -27,11 +29,12 @@ export default async function handler(req, res) {
         ok: false,
         status: result.status,
         statusText: result.statusText,
-        body: result.body
+        body: result.body,
+        objectKey: OPPORTUNITY_OBJECT_KEY
       });
     }
 
-    const normalizedFields = normalizeLocationFields(result.body);
+    const normalizedFields = normalizeObjectSchemaFields(result.body);
     const matches = wantedKeys.length
       ? normalizedFields.filter((field) => wantedKeys.includes(field.key))
       : normalizedFields;
@@ -39,10 +42,11 @@ export default async function handler(req, res) {
     return res.status(200).json({
       ok: true,
       locationId,
-      source: "location_custom_fields",
+      source: "opportunity_object_schema",
+      objectKey: OPPORTUNITY_OBJECT_KEY,
       wantedKeys,
       found: matches.length,
-      totalCustomFields: normalizedFields.length,
+      totalFields: normalizedFields.length,
       matches
     });
   } catch (error) {
