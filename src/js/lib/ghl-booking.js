@@ -102,7 +102,9 @@ export function buildOpportunityCustomFields(config, booking, options = {}) {
   const reservationStatus = cleanString(options.reservationStatus || DEFAULT_RESERVATION_STATUS, 80);
   const paymentStatus = cleanString(options.paymentStatus || DEFAULT_PAYMENT_STATUS, 80);
   const calendarStatus = cleanString(options.calendarStatus || DEFAULT_CALENDAR_STATUS, 80);
-  const holdExpiresAt = options.holdExpiresAt || buildHoldExpiresAt(booking);
+  const holdExpiresAt = Object.prototype.hasOwnProperty.call(options, "holdExpiresAt")
+    ? options.holdExpiresAt
+    : buildHoldExpiresAt(booking);
   const fields = [];
 
   pushField(fields, config.customFields.roomNameFieldId, resolveRoomFieldValue(booking));

@@ -1,8 +1,7 @@
-import { BOOKING_UI_TEXT, PAYMENT_CONFIG } from "./config.js";
+import { PAYMENT_CONFIG } from "./config.js";
 import { formatCurrency, formatDateValue } from "./lib/booking.js";
-import { clearBookingDraft, loadBookingDraft, saveBookingDraft } from "./lib/booking-draft.js";
+import { loadBookingDraft, saveBookingDraft } from "./lib/booking-draft.js";
 import { escapeAttribute, escapeHtml } from "./lib/escape.js";
-import { buildPaymentHandoffUrl, hasLivePaymentUrl } from "./lib/payment.js";
 
 function formatGuests(draft) {
   const adults = Number(draft.adults || 0);
@@ -176,6 +175,54 @@ async function createBookingIntent(draft) {
   };
 }
 
+async function createCheckoutSession(draft) {
+  const response = await fetch("/api/paymongo/create-checkout", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json"
+    },
+    body: JSON.stringify({
+      roomId: draft.roomId || "",
+      roomName: draft.roomName || "",
+      checkin: draft.checkin || "",
+      checkout: draft.checkout || "",
+      adults: draft.adults || "",
+      children: draft.children || "",
+      fullName: draft.fullName || "",
+      email: draft.email || "",
+      phone: draft.phone || "",
+      arrivalTime: draft.arrivalTime || "",
+      specialRequests: draft.specialRequests || "",
+      reference: draft.reference || "",
+      pricingSource: draft.pricingSource || "",
+      ghlContactId: draft.ghlContactId || "",
+      ghlOpportunityId: draft.ghlOpportunityId || ""
+    })
+  });
+
+  let payload = null;
+
+  try {
+    payload = await response.json();
+  } catch {
+    payload = null;
+  }
+
+  if (!response.ok || !payload?.ok) {
+    return {
+      ok: false,
+      error: payload?.error || payload?.body?.errors?.[0]?.detail || "Unable to prepare PayMongo checkout."
+    };
+  }
+
+  return {
+    ok: true,
+    checkoutUrl: payload.checkoutUrl || "",
+    checkoutSessionId: payload.checkoutSessionId || ""
+  };
+}
+
 function renderEmptyState() {
   return `
     <section id="eekos-room-selector" class="eekos-payment-page-root">
@@ -191,7 +238,6 @@ function renderEmptyState() {
 }
 
 function renderPaymentPage(draft) {
-  const paymentReady = hasLivePaymentUrl(PAYMENT_CONFIG.paymentUrl);
   const bookingUrl = draft.roomId
     ? `./booking.html?room=${encodeURIComponent(draft.roomId)}`
     : "./index.html#eekos-room-selector";
@@ -273,7 +319,7 @@ function renderPaymentPage(draft) {
           <div class="eekos-payment-trust-points">
             <span>Final amount shown before payment</span>
             <span>Secure hosted checkout</span>
-            <span>Reservation confirmed after payment</span>
+            <span>Reservation confirmed after deposit payment</span>
           </div>
 
           <div class="eekos-form-actions eekos-form-actions--spacious eekos-payment-actions">
@@ -282,14 +328,14 @@ function renderPaymentPage(draft) {
               type="button"
               class="eekos-btn eekos-btn--primary"
               id="eekos-checkout-button"
-              aria-disabled="${paymentReady ? "false" : "true"}"
+              aria-disabled="false"
             >
               ${escapeHtml(checkoutButtonLabel)}
             </button>
           </div>
 
-          <p class="eekos-micro ${paymentReady ? "" : "is-warning"}" id="eekos-payment-note">
-            ${escapeHtml(paymentReady ? BOOKING_UI_TEXT.paymentReadyNote : BOOKING_UI_TEXT.paymentMissingNote)}
+          <p class="eekos-micro" id="eekos-payment-note">
+            Reservation requests can be submitted now, but the room is only secured after successful deposit payment on the PayMongo checkout page.
           </p>
         </section>
 
@@ -327,8 +373,8 @@ function renderPaymentPage(draft) {
             <p class="eekos-summary-rate">What happens next</p>
             <ul class="eekos-payment-policy-list">
               <li>Checkout opens on a secure hosted page.</li>
-              <li>The final amount is shown again before payment is completed.</li>
-              <li>If payment is not completed, the room should remain available for other guests.</li>
+              <li>The final amount and deposit due are shown again before payment is completed.</li>
+              <li>If payment is not completed, the room remains available for other guests.</li>
             </ul>
           </section>
         </div>
@@ -355,7 +401,6 @@ function mountPaymentPage() {
 
   const feedback = document.getElementById("eekos-payment-feedback");
   const checkoutButton = document.getElementById("eekos-checkout-button");
-  const paymentReady = hasLivePaymentUrl(PAYMENT_CONFIG.paymentUrl);
 
   if (!checkoutButton || !feedback) {
     return;
@@ -371,17 +416,8 @@ function mountPaymentPage() {
     feedback.removeAttribute("data-state");
   }
 
-  checkoutButton.disabled = !paymentReady;
-  checkoutButton.classList.toggle("is-disabled", !paymentReady);
-  checkoutButton.setAttribute("aria-disabled", paymentReady ? "false" : "true");
-
   checkoutButton.addEventListener("click", async () => {
     clearFeedback();
-
-    if (!paymentReady) {
-      setFeedback("Checkout is not configured yet. Add a live payment URL in config before production.");
-      return;
-    }
 
     const originalButtonLabel = checkoutButton.textContent;
     checkoutButton.disabled = true;
@@ -411,41 +447,29 @@ function mountPaymentPage() {
       saveBookingDraft(draft);
     }
 
-    const paymentUrl = buildPaymentHandoffUrl(PAYMENT_CONFIG.paymentUrl, {
-      room: draft.roomName || "",
-      room_id: draft.roomId || "",
-      checkin: draft.checkin || "",
-      checkout: draft.checkout || "",
-      adults: draft.adults || "",
-      children: draft.children || "",
-      full_name: draft.fullName || "",
-      email: draft.email || "",
-      phone: draft.phone || "",
-      arrival_time: draft.arrivalTime || "",
-      special_requests: draft.specialRequests || "",
-      reference: draft.reference || "",
-      nights: draft.nights || "",
-      estimated_total: parseAmount(draft.total) > 0 ? String(parseAmount(draft.total)) : "",
-      deposit_due: parseAmount(draft.deposit) > 0 ? String(parseAmount(draft.deposit)) : "",
-      balance_due: parseAmount(draft.balance) > 0 ? String(parseAmount(draft.balance)) : "",
-      ghl_contact_id: draft.ghlContactId || "",
-      ghl_opportunity_id: draft.ghlOpportunityId || ""
-    });
+    const checkoutSession = await createCheckoutSession(draft);
 
-    if (!paymentUrl) {
-      setFeedback("Unable to prepare checkout URL. Please review payment configuration.");
+    if (!checkoutSession.ok || !checkoutSession.checkoutUrl) {
+      setFeedback(`${checkoutSession.error} Secure checkout could not be prepared right now.`);
       checkoutButton.disabled = false;
       checkoutButton.classList.remove("is-disabled");
       checkoutButton.textContent = originalButtonLabel;
       return;
     }
 
+    draft = {
+      ...draft,
+      paymongoCheckoutSessionId: checkoutSession.checkoutSessionId,
+      checkoutPreparedAt: new Date().toISOString()
+    };
+
+    saveBookingDraft(draft);
+
     if (PAYMENT_CONFIG.openInNewTab) {
-      const paymentWindow = window.open(paymentUrl, "_blank", "noopener");
+      const paymentWindow = window.open(checkoutSession.checkoutUrl, "_blank", "noopener");
 
       if (!paymentWindow) {
-        clearBookingDraft();
-        window.location.assign(paymentUrl);
+        window.location.assign(checkoutSession.checkoutUrl);
         return;
       }
 
@@ -455,8 +479,7 @@ function mountPaymentPage() {
       return;
     }
 
-    clearBookingDraft();
-    window.location.assign(paymentUrl);
+    window.location.assign(checkoutSession.checkoutUrl);
   });
 }
 

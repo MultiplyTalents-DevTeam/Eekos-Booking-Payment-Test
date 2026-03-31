@@ -9,7 +9,7 @@ import {
 } from "./lib/booking.js";
 import { loadBookingDraft, saveBookingDraft } from "./lib/booking-draft.js";
 import { escapeAttribute, escapeHtml } from "./lib/escape.js";
-import { createBookingReference, hasLivePaymentUrl } from "./lib/payment.js";
+import { createBookingReference } from "./lib/payment.js";
 import { syncDateInputMinimums, validateGuestDetails, validateStayDetails } from "./lib/validation.js";
 
 function getRoomFromQuery() {
@@ -295,7 +295,6 @@ function mountBookingPage() {
     phone: phoneInput
   };
 
-  const paymentReady = hasLivePaymentUrl(PAYMENT_CONFIG.paymentUrl);
   const defaultRateText = getRoomRateText(room);
 
   function clearFeedback() {
@@ -339,14 +338,12 @@ function mountBookingPage() {
   }
 
   function setPaymentUiState() {
-    submitButton.disabled = !paymentReady;
-    submitButton.classList.toggle("is-disabled", !paymentReady);
-    submitButton.setAttribute("aria-disabled", String(!paymentReady));
+    submitButton.disabled = false;
+    submitButton.classList.remove("is-disabled");
+    submitButton.setAttribute("aria-disabled", "false");
 
-    bookingNote.textContent = paymentReady
-      ? "Your reservation is confirmed only after successful payment on the secure checkout page."
-      : "Checkout link is not configured yet. Add your hosted payment URL before using this flow in production.";
-    bookingNote.classList.toggle("is-warning", !paymentReady);
+    bookingNote.textContent = "Your reservation request is saved first. The room is only secured after successful payment on the secure checkout page.";
+    bookingNote.classList.remove("is-warning");
   }
 
   function updateSummary() {
@@ -438,12 +435,6 @@ function mountBookingPage() {
   form.addEventListener("submit", (event) => {
     event.preventDefault();
     clearFeedback();
-
-    if (!paymentReady) {
-      setFeedback("Checkout is not configured yet. Add the live payment URL before launch.");
-      submitButton.focus({ preventScroll: true });
-      return;
-    }
 
     const stayValidation = validateStayDetails({
       checkin: checkinInput.value,

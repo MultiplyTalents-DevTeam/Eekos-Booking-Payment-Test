@@ -69,6 +69,52 @@ export function buildBookingIntentAutomationPayload({
   };
 }
 
+export function buildPaymentAutomationPayload({
+  eventType,
+  locationId,
+  contactId,
+  opportunityId,
+  booking,
+  reservationStatus,
+  paymentStatus,
+  calendarStatus,
+  paymentReference,
+  checkoutSessionId,
+  paymongoEventType,
+  paidAt
+}) {
+  return {
+    event_type: cleanString(eventType, 80),
+    event_created_at: new Date().toISOString(),
+    source: "EEKOS Website",
+    location_id: cleanString(locationId, 120),
+    contact_id: cleanString(contactId, 120),
+    opportunity_id: cleanString(opportunityId, 120),
+    reservation_reference: cleanString(booking.reference, 120),
+    room_id: cleanString(booking.roomId, 120),
+    room_name: cleanString(booking.roomName, 120),
+    checkin_date: cleanString(booking.checkin, 40),
+    checkout_date: cleanString(booking.checkout, 40),
+    adults: toInteger(booking.adults),
+    children: toInteger(booking.children),
+    guest_name: cleanString(booking.fullName, 160),
+    email: cleanString(booking.email, 160),
+    phone: cleanString(booking.phone, 40),
+    arrival_time: cleanString(booking.arrivalTime, 80),
+    special_requests: cleanString(booking.specialRequests, 500),
+    final_total_amount: toNumber(booking.total),
+    deposit_amount_due: toNumber(booking.deposit),
+    balance_due: toNumber(booking.balance),
+    reservation_status: cleanString(reservationStatus, 80),
+    payment_status: cleanString(paymentStatus, 80),
+    calendar_status: cleanString(calendarStatus, 80),
+    payment_reference: cleanString(paymentReference, 160),
+    checkout_session_id: cleanString(checkoutSessionId, 160),
+    paymongo_event_type: cleanString(paymongoEventType, 120),
+    paid_at: cleanString(paidAt, 80)
+  };
+}
+
 export async function dispatchInboundWebhook(webhookUrl, payload) {
   if (!webhookUrl) {
     return {

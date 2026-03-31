@@ -3,6 +3,7 @@ import assert from "node:assert/strict";
 
 import {
   buildBookingIntentAutomationPayload,
+  buildPaymentAutomationPayload,
   resolveInboundWebhookUrl
 } from "../api/_lib/ghl-webhook-dispatch.js";
 
@@ -67,4 +68,45 @@ test("buildBookingIntentAutomationPayload creates a safe booking event payload",
   assert.equal(payload.payment_status, "pending");
   assert.equal(payload.calendar_status, "not_blocked");
   assert.match(payload.event_created_at, /^\d{4}-\d{2}-\d{2}T/);
+});
+
+test("buildPaymentAutomationPayload includes payment-specific fields", () => {
+  const payload = buildPaymentAutomationPayload({
+    eventType: "payment_paid",
+    locationId: "loc_123",
+    contactId: "contact_123",
+    opportunityId: "opp_123",
+    reservationStatus: "confirmed_reservation",
+    paymentStatus: "paid",
+    calendarStatus: "reserved",
+    paymentReference: "pay_123",
+    checkoutSessionId: "cs_test_123",
+    paymongoEventType: "checkout_session.payment.paid",
+    paidAt: "2026-03-31T12:00:00.000Z",
+    booking: {
+      reference: "EEKOS-12345678",
+      roomId: "suite-with-balcony",
+      roomName: "Suite with Balcony",
+      checkin: "2026-04-05",
+      checkout: "2026-04-07",
+      adults: "2",
+      children: "1",
+      fullName: "Jane Doe",
+      email: "jane@example.com",
+      phone: "+639171234567",
+      arrivalTime: "3:00 PM",
+      specialRequests: "Late arrival please",
+      total: "7700",
+      deposit: "2310",
+      balance: "5390"
+    }
+  });
+
+  assert.equal(payload.event_type, "payment_paid");
+  assert.equal(payload.payment_reference, "pay_123");
+  assert.equal(payload.checkout_session_id, "cs_test_123");
+  assert.equal(payload.paymongo_event_type, "checkout_session.payment.paid");
+  assert.equal(payload.paid_at, "2026-03-31T12:00:00.000Z");
+  assert.equal(payload.payment_status, "paid");
+  assert.equal(payload.calendar_status, "reserved");
 });
