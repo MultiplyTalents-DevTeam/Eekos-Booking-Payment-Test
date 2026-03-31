@@ -210,16 +210,22 @@ async function createCheckoutSession(draft) {
   }
 
   if (!response.ok || !payload?.ok) {
+    const paymongoDetail = payload?.body?.errors?.[0]?.detail
+      || payload?.body?.errors?.[0]?.title
+      || payload?.body?.message
+      || payload?.body?.error;
+
     return {
       ok: false,
-      error: payload?.error || payload?.body?.errors?.[0]?.detail || "Unable to prepare PayMongo checkout."
+      error: paymongoDetail || payload?.error || "Unable to prepare PayMongo checkout."
     };
   }
 
   return {
     ok: true,
     checkoutUrl: payload.checkoutUrl || "",
-    checkoutSessionId: payload.checkoutSessionId || ""
+    checkoutSessionId: payload.checkoutSessionId || "",
+    reference: payload.reference || ""
   };
 }
 
@@ -459,6 +465,7 @@ function mountPaymentPage() {
 
     draft = {
       ...draft,
+      reference: checkoutSession.reference || draft.reference,
       paymongoCheckoutSessionId: checkoutSession.checkoutSessionId,
       checkoutPreparedAt: new Date().toISOString()
     };

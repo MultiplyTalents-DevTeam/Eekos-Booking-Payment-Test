@@ -103,6 +103,43 @@ function buildCheckoutBooking(body, room, financials) {
   };
 }
 
+function extractPaymongoErrorText(body) {
+  if (!body) {
+    return "";
+  }
+
+  if (typeof body === "string") {
+    return cleanString(body, 300);
+  }
+
+  const firstError = Array.isArray(body?.errors) ? body.errors[0] : null;
+  return cleanString(
+    firstError?.detail
+      || firstError?.title
+      || firstError?.code
+      || body?.message
+      || body?.error
+      || "",
+    300
+  );
+}
+
+function isDuplicateReferenceError(checkoutResult) {
+  if (checkoutResult?.status !== 400) {
+    return false;
+  }
+
+  const detail = extractPaymongoErrorText(checkoutResult.body).toLowerCase();
+  return detail.includes("reference")
+    && (detail.includes("already") || detail.includes("duplicate") || detail.includes("exist"));
+}
+
+function buildRetryReference(reference) {
+  const base = cleanString(reference, 100) || `EEKOS-${Date.now().toString().slice(-8)}`;
+  const suffix = Date.now().toString().slice(-6);
+  return cleanString(`${base}-${suffix}`, 120);
+}
+
 export default async function handler(req, res) {
   if (req.method === "GET") {
     const config = resolvePaymongoConfig(process.env, PAYMENT_CONFIG);
@@ -197,7 +234,7 @@ export default async function handler(req, res) {
       opportunity: booking.ghlOpportunityId
     });
 
-    const paymongoPayload = buildPaymongoCheckoutPayload({
+    let paymongoPayload = buildPaymongoCheckoutPayload({
       booking,
       room,
       financials,
@@ -206,7 +243,7 @@ export default async function handler(req, res) {
       cancelUrl
     });
 
-    const checkoutResult = await fetchPaymongoJson(
+    let checkoutResult = await fetchPaymongoJson(
       resolvePaymongoCheckoutRoute(),
       paymongoConfig.secretKey,
       {
@@ -215,10 +252,44 @@ export default async function handler(req, res) {
       }
     );
 
+    if (!checkoutResult.ok && isDuplicateReferenceError(checkoutResult)) {
+      booking.reference = buildRetryReference(booking.reference);
+
+      const retrySuccessUrl = appendQueryParams(paymongoConfig.successUrl, {
+        reference: booking.reference,
+        room: room.id,
+        opportunity: booking.ghlOpportunityId
+      });
+      const retryCancelUrl = appendQueryParams(paymongoConfig.cancelUrl, {
+        reference: booking.reference,
+        room: room.id,
+        opportunity: booking.ghlOpportunityId
+      });
+
+      paymongoPayload = buildPaymongoCheckoutPayload({
+        booking,
+        room,
+        financials,
+        paymongoConfig,
+        successUrl: retrySuccessUrl,
+        cancelUrl: retryCancelUrl
+      });
+
+      checkoutResult = await fetchPaymongoJson(
+        resolvePaymongoCheckoutRoute(),
+        paymongoConfig.secretKey,
+        {
+          method: "POST",
+          body: JSON.stringify(paymongoPayload)
+        }
+      );
+    }
+
     if (!checkoutResult.ok) {
+      const detail = extractPaymongoErrorText(checkoutResult.body);
       return json(res, 502, {
         ok: false,
-        error: "Unable to create PayMongo checkout session.",
+        error: detail ? `PayMongo checkout error: ${detail}` : "Unable to create PayMongo checkout session.",
         status: checkoutResult.status,
         statusText: checkoutResult.statusText,
         body: checkoutResult.body
@@ -249,6 +320,7 @@ export default async function handler(req, res) {
       ok: true,
       checkoutUrl,
       checkoutSessionId,
+      reference: booking.reference,
       dueNow: booking.deposit,
       estimatedTotal: booking.total,
       balanceDue: booking.balance,
