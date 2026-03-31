@@ -3,9 +3,17 @@ import {
   buildContactUpsertPayload,
   buildOpportunityPayload
 } from "../src/js/lib/ghl-booking.js";
+import {
+  buildBookingIntentAutomationPayload,
+  dispatchInboundWebhook,
+  resolveInboundWebhookUrl
+} from "./_lib/ghl-webhook-dispatch.js";
 
 const GHL_BASE_URL = "https://services.leadconnectorhq.com";
 const GHL_API_VERSION = "2021-07-28";
+const DEFAULT_RESERVATION_STATUS = "awaiting_payment";
+const DEFAULT_PAYMENT_STATUS = "pending";
+const DEFAULT_CALENDAR_STATUS = "not_blocked";
 
 function json(res, status, payload) {
   return res.status(status).json(payload);
@@ -112,6 +120,7 @@ async function fetchGhl(path, token, method, payload) {
 export default async function handler(req, res) {
   if (req.method === "GET") {
     const config = resolveGhlConfig(process.env);
+    const inboundWebhookUrl = resolveInboundWebhookUrl(process.env);
 
     return json(res, 200, {
       ok: true,
@@ -122,7 +131,8 @@ export default async function handler(req, res) {
         GHL_ACCESS_TOKEN: Boolean(process.env.GHL_ACCESS_TOKEN),
         GHL_LOCATION_ID: Boolean(process.env.GHL_LOCATION_ID),
         GHL_RESERVATIONS_PIPELINE_ID: hasLiveGhlId(config.pipeline.reservationsPipelineId),
-        GHL_STAGE_WAITING_FOR_PAYMENT_ID: hasLiveGhlId(config.pipeline.stages.waitingForPaymentStageId)
+        GHL_STAGE_WAITING_FOR_PAYMENT_ID: hasLiveGhlId(config.pipeline.stages.waitingForPaymentStageId),
+        GHL_INBOUND_WEBHOOK_URL: Boolean(inboundWebhookUrl)
       },
       expectedBodyFields: [
         "roomId",
@@ -240,8 +250,8 @@ export default async function handler(req, res) {
     }
 
     const opportunityPayload = buildOpportunityPayload(config, booking, contactId, {
-      reservationStatus: "waiting_for_payment",
-      paymentStatus: "unpaid"
+      reservationStatus: DEFAULT_RESERVATION_STATUS,
+      paymentStatus: DEFAULT_PAYMENT_STATUS
     });
 
     const opportunityResult = await fetchGhl("/opportunities/", token, "POST", opportunityPayload);
@@ -262,13 +272,42 @@ export default async function handler(req, res) {
     }
 
     const opportunityId = getEntityId(opportunityResult.body, ["opportunity"]);
+    const inboundWebhookUrl = resolveInboundWebhookUrl(process.env);
+    const automationPayload = buildBookingIntentAutomationPayload({
+      locationId,
+      contactId,
+      opportunityId,
+      booking,
+      reservationStatus: DEFAULT_RESERVATION_STATUS,
+      paymentStatus: DEFAULT_PAYMENT_STATUS,
+      calendarStatus: DEFAULT_CALENDAR_STATUS
+    });
+    const automationResult = await dispatchInboundWebhook(inboundWebhookUrl, automationPayload);
 
     return json(res, 200, {
       ok: true,
       contactId,
       opportunityId,
-      reservationStatus: "waiting_for_payment",
-      paymentStatus: "unpaid"
+      reservationStatus: DEFAULT_RESERVATION_STATUS,
+      paymentStatus: DEFAULT_PAYMENT_STATUS,
+      automation: automationResult.skipped
+        ? {
+            enabled: false,
+            dispatched: false,
+            reason: automationResult.reason
+          }
+        : automationResult.ok
+          ? {
+              enabled: true,
+              dispatched: true,
+              status: automationResult.status
+            }
+          : {
+              enabled: true,
+              dispatched: false,
+              status: automationResult.status,
+              statusText: automationResult.statusText
+            }
     });
   } catch (error) {
     return json(res, 500, {

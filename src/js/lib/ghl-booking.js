@@ -1,6 +1,9 @@
 import { hasLiveGhlId } from "../ghl-config.js";
 
 const DEFAULT_HOLD_MINUTES = 20;
+const DEFAULT_RESERVATION_STATUS = "awaiting_payment";
+const DEFAULT_PAYMENT_STATUS = "pending";
+const DEFAULT_CALENDAR_STATUS = "not_blocked";
 
 function cleanString(value, maxLength = 500) {
   if (value == null) {
@@ -30,6 +33,13 @@ function toNumber(value) {
 function toInteger(value) {
   const parsed = Number.parseInt(value, 10);
   return Number.isFinite(parsed) ? parsed : 0;
+}
+
+function toRoomOptionKey(value) {
+  return cleanString(value, 120)
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "_")
+    .replace(/^_+|_+$/g, "");
 }
 
 export function splitFullName(fullName) {
@@ -72,6 +82,10 @@ export function buildHoldExpiresAt(booking, holdMinutes = DEFAULT_HOLD_MINUTES) 
   return baseDate.toISOString();
 }
 
+export function resolveRoomFieldValue(booking) {
+  return toRoomOptionKey(booking.roomOptionKey || booking.roomId || booking.roomName || booking.room);
+}
+
 function pushField(fields, fieldId, value) {
   if (!hasLiveGhlId(fieldId)) {
     return;
@@ -85,12 +99,13 @@ function pushField(fields, fieldId, value) {
 }
 
 export function buildOpportunityCustomFields(config, booking, options = {}) {
-  const reservationStatus = cleanString(options.reservationStatus || "waiting_for_payment", 80);
-  const paymentStatus = cleanString(options.paymentStatus || "unpaid", 80);
+  const reservationStatus = cleanString(options.reservationStatus || DEFAULT_RESERVATION_STATUS, 80);
+  const paymentStatus = cleanString(options.paymentStatus || DEFAULT_PAYMENT_STATUS, 80);
+  const calendarStatus = cleanString(options.calendarStatus || DEFAULT_CALENDAR_STATUS, 80);
   const holdExpiresAt = options.holdExpiresAt || buildHoldExpiresAt(booking);
   const fields = [];
 
-  pushField(fields, config.customFields.roomNameFieldId, cleanString(booking.roomName || booking.room, 120));
+  pushField(fields, config.customFields.roomNameFieldId, resolveRoomFieldValue(booking));
   pushField(fields, config.customFields.checkInDateFieldId, cleanString(booking.checkin, 40));
   pushField(fields, config.customFields.checkOutDateFieldId, cleanString(booking.checkout, 40));
   pushField(fields, config.customFields.reservationStatusFieldId, reservationStatus);
@@ -101,6 +116,9 @@ export function buildOpportunityCustomFields(config, booking, options = {}) {
   pushField(fields, config.customFields.adultCountFieldId, toInteger(booking.adults));
   pushField(fields, config.customFields.childCountFieldId, toInteger(booking.children));
   pushField(fields, config.customFields.paymentReferenceFieldId, cleanString(booking.paymentReference, 120));
+  pushField(fields, config.customFields.reservationReferenceFieldId, cleanString(booking.reference, 120));
+  pushField(fields, config.customFields.calendarStatusFieldId, calendarStatus);
+  pushField(fields, config.customFields.depositAmountDueFieldId, toNumber(booking.deposit));
 
   return fields;
 }

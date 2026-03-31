@@ -7,6 +7,7 @@ import {
   buildOpportunityCustomFields,
   buildOpportunityName,
   buildOpportunityPayload,
+  resolveRoomFieldValue,
   splitFullName
 } from "../src/js/lib/ghl-booking.js";
 
@@ -29,11 +30,15 @@ const config = {
     specialRequestsFieldId: "field_requests",
     adultCountFieldId: "field_adults",
     childCountFieldId: "field_children",
-    paymentReferenceFieldId: "field_payment_reference"
+    paymentReferenceFieldId: "field_payment_reference",
+    reservationReferenceFieldId: "field_reservation_reference",
+    calendarStatusFieldId: "field_calendar_status",
+    depositAmountDueFieldId: "field_deposit_due"
   }
 };
 
 const booking = {
+  roomId: "suite-with-balcony",
   roomName: "Suite with Balcony",
   checkin: "2026-04-05",
   checkout: "2026-04-07",
@@ -62,6 +67,10 @@ test("buildOpportunityName includes room, guest, and reference", () => {
   );
 });
 
+test("resolveRoomFieldValue converts website room ids into GHL option keys", () => {
+  assert.equal(resolveRoomFieldValue(booking), "suite_with_balcony");
+});
+
 test("buildHoldExpiresAt adds twenty minutes by default", () => {
   assert.equal(buildHoldExpiresAt(booking), "2026-03-31T10:20:00.000Z");
 });
@@ -80,16 +89,19 @@ test("buildContactUpsertPayload prepares a clean GHL contact payload", () => {
 
 test("buildOpportunityCustomFields maps configured EEKOS fields to GHL ids", () => {
   assert.deepEqual(buildOpportunityCustomFields(config, booking), [
-    { id: "field_room", value: "Suite with Balcony" },
+    { id: "field_room", value: "suite_with_balcony" },
     { id: "field_checkin", value: "2026-04-05" },
     { id: "field_checkout", value: "2026-04-07" },
-    { id: "field_reservation_status", value: "waiting_for_payment" },
-    { id: "field_payment_status", value: "unpaid" },
+    { id: "field_reservation_status", value: "awaiting_payment" },
+    { id: "field_payment_status", value: "pending" },
     { id: "field_total", value: 7700 },
     { id: "field_hold_expires_at", value: "2026-03-31T10:20:00.000Z" },
     { id: "field_requests", value: "Late arrival please" },
     { id: "field_adults", value: 2 },
-    { id: "field_children", value: 1 }
+    { id: "field_children", value: 1 },
+    { id: "field_reservation_reference", value: "EEKOS-12345678" },
+    { id: "field_calendar_status", value: "not_blocked" },
+    { id: "field_deposit_due", value: 0 }
   ]);
 });
 
@@ -104,16 +116,19 @@ test("buildOpportunityPayload creates the Waiting for Payment opportunity payloa
     source: "EEKOS Website",
     monetaryValue: 7700,
     customFields: [
-      { id: "field_room", value: "Suite with Balcony" },
+      { id: "field_room", value: "suite_with_balcony" },
       { id: "field_checkin", value: "2026-04-05" },
       { id: "field_checkout", value: "2026-04-07" },
-      { id: "field_reservation_status", value: "waiting_for_payment" },
-      { id: "field_payment_status", value: "unpaid" },
+      { id: "field_reservation_status", value: "awaiting_payment" },
+      { id: "field_payment_status", value: "pending" },
       { id: "field_total", value: 7700 },
       { id: "field_hold_expires_at", value: "2026-03-31T10:20:00.000Z" },
       { id: "field_requests", value: "Late arrival please" },
       { id: "field_adults", value: 2 },
-      { id: "field_children", value: 1 }
+      { id: "field_children", value: 1 },
+      { id: "field_reservation_reference", value: "EEKOS-12345678" },
+      { id: "field_calendar_status", value: "not_blocked" },
+      { id: "field_deposit_due", value: 0 }
     ]
   });
 });

@@ -30,7 +30,10 @@ export const GHL_CONFIG = {
     specialRequestsFieldId: "__SET_GHL_FIELD_SPECIAL_REQUESTS_ID__",
     adultCountFieldId: "__SET_GHL_FIELD_ADULT_COUNT_ID__",
     childCountFieldId: "__SET_GHL_FIELD_CHILD_COUNT_ID__",
-    paymentReferenceFieldId: "__SET_GHL_FIELD_PAYMENT_REFERENCE_ID__"
+    paymentReferenceFieldId: "__SET_GHL_FIELD_PAYMENT_REFERENCE_ID__",
+    reservationReferenceFieldId: "__SET_GHL_FIELD_RESERVATION_REFERENCE_ID__",
+    calendarStatusFieldId: "__SET_GHL_FIELD_CALENDAR_STATUS_ID__",
+    depositAmountDueFieldId: "__SET_GHL_FIELD_DEPOSIT_AMOUNT_DUE_ID__"
   }
 };
 
@@ -65,7 +68,10 @@ export function resolveGhlConfig(env = {}, baseConfig = GHL_CONFIG) {
       specialRequestsFieldId: env.GHL_FIELD_SPECIAL_REQUESTS_ID || baseConfig.customFields.specialRequestsFieldId,
       adultCountFieldId: env.GHL_FIELD_ADULT_COUNT_ID || baseConfig.customFields.adultCountFieldId,
       childCountFieldId: env.GHL_FIELD_CHILD_COUNT_ID || baseConfig.customFields.childCountFieldId,
-      paymentReferenceFieldId: env.GHL_FIELD_PAYMENT_REFERENCE_ID || baseConfig.customFields.paymentReferenceFieldId
+      paymentReferenceFieldId: env.GHL_FIELD_PAYMENT_REFERENCE_ID || baseConfig.customFields.paymentReferenceFieldId,
+      reservationReferenceFieldId: env.GHL_FIELD_RESERVATION_REFERENCE_ID || baseConfig.customFields.reservationReferenceFieldId,
+      calendarStatusFieldId: env.GHL_FIELD_CALENDAR_STATUS_ID || baseConfig.customFields.calendarStatusFieldId,
+      depositAmountDueFieldId: env.GHL_FIELD_DEPOSIT_AMOUNT_DUE_ID || baseConfig.customFields.depositAmountDueFieldId
     }
   };
 }

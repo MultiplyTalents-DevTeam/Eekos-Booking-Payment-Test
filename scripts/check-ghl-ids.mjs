@@ -1,6 +1,7 @@
-import { GHL_CONFIG, summarizeGhlConfig } from "../src/js/ghl-config.js";
+import { GHL_CONFIG, resolveGhlConfig, summarizeGhlConfig } from "../src/js/ghl-config.js";
 
-const summary = summarizeGhlConfig(GHL_CONFIG);
+const resolvedConfig = resolveGhlConfig(process.env, GHL_CONFIG);
+const summary = summarizeGhlConfig(resolvedConfig);
 
 console.log("EEKOS GHL ID Check");
 console.log("");
@@ -16,6 +17,6 @@ summary.missingPaths.forEach((path) => {
 });
 
 console.log("");
-console.log("Update src/js/ghl-config.js before wiring live GHL data mapping.");
+console.log("Set the missing IDs in environment variables or src/js/ghl-config.js before wiring live GHL data mapping.");
 
 process.exit(1);

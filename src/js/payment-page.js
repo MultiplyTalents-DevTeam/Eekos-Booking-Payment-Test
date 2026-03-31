@@ -171,8 +171,8 @@ async function createBookingIntent(draft) {
     ok: true,
     contactId: payload.contactId || "",
     opportunityId: payload.opportunityId || "",
-    reservationStatus: payload.reservationStatus || "waiting_for_payment",
-    paymentStatus: payload.paymentStatus || "unpaid"
+    reservationStatus: payload.reservationStatus || "awaiting_payment",
+    paymentStatus: payload.paymentStatus || "pending"
   };
 }
 
