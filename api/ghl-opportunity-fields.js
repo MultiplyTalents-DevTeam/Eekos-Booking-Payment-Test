@@ -20,9 +20,13 @@ export default async function handler(req, res) {
     }
 
     const wantedKeys = parseCommaSeparatedValues(req.query?.keys || process.env.GHL_WANTED_OPPORTUNITY_FIELD_KEYS);
-    const result = await fetchGhlJson(`/objects/${OPPORTUNITY_OBJECT_KEY}`, token, {
+    const result = await fetchGhlJson(
+      `/objects/${OPPORTUNITY_OBJECT_KEY}?locationId=${encodeURIComponent(locationId)}`,
+      token,
+      {
       method: "GET"
-    });
+      }
+    );
 
     if (!result.ok) {
       return res.status(result.status).json({
