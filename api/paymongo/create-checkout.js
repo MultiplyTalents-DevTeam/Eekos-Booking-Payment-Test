@@ -51,18 +51,62 @@ function cleanString(value, maxLength = 500) {
     .slice(0, maxLength);
 }
 
+function firstHeaderValue(value) {
+  return cleanString(Array.isArray(value) ? value[0] : String(value || "").split(",")[0], 240);
+}
+
+function resolveRequestBaseUrl(req) {
+  const forwardedProto = firstHeaderValue(req?.headers?.["x-forwarded-proto"]);
+  const forwardedHost = firstHeaderValue(req?.headers?.["x-forwarded-host"]);
+  const host = forwardedHost || firstHeaderValue(req?.headers?.host);
+  const protocol = forwardedProto || (host.includes("localhost") ? "http" : "https");
+
+  if (!host) {
+    return "";
+  }
+
+  return `${protocol}://${host}`;
+}
+
+function normalizeRoomToken(value) {
+  return cleanString(value, 160)
+    .toLowerCase()
+    .replace(/[^\w\s-]+/g, "")
+    .replace(/[_\s]+/g, "-")
+    .replace(/-+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
 function findRoom(body) {
   const requestedRoomId = cleanString(body.roomId, 120);
-  const requestedRoomName = cleanString(body.roomName || body.room, 120).toLowerCase();
+  const requestedRoomName = cleanString(body.roomName || body.room, 120);
+  const requestedRoomToken = normalizeRoomToken(requestedRoomId);
+  const requestedNameToken = normalizeRoomToken(requestedRoomName);
+  const candidates = new Set(
+    [requestedRoomToken, requestedNameToken]
+      .filter(Boolean)
+      .flatMap((token) => [token, token.replace(/-/g, "_"), token.replace(/_/g, "-")])
+  );
 
   return ROOM_DATA.find((room) => room.id === requestedRoomId)
-    || ROOM_DATA.find((room) => room.name.toLowerCase() === requestedRoomName)
+    || ROOM_DATA.find((room) => room.name.toLowerCase() === requestedRoomName.toLowerCase())
+    || ROOM_DATA.find((room) => {
+      const roomIdToken = normalizeRoomToken(room.id);
+      const roomNameToken = normalizeRoomToken(room.name);
+      return candidates.has(roomIdToken) || candidates.has(roomNameToken);
+    })
     || null;
 }
 
 function validateCheckoutBody(body) {
+  const roomId = cleanString(body.roomId, 120);
+  const roomName = cleanString(body.roomName || body.room, 120);
+
+  if (!roomId && !roomName) {
+    return { valid: false, field: "roomId", message: "Missing roomId" };
+  }
+
   const required = {
-    roomId: cleanString(body.roomId, 120),
     checkin: cleanString(body.checkin, 40),
     checkout: cleanString(body.checkout, 40),
     fullName: cleanString(body.fullName, 160),
@@ -140,6 +184,32 @@ function buildRetryReference(reference) {
   return cleanString(`${base}-${suffix}`, 120);
 }
 
+function isRedirectUrlError(checkoutResult) {
+  if (checkoutResult?.status !== 400 && checkoutResult?.status !== 404) {
+    return false;
+  }
+
+  const detail = extractPaymongoErrorText(checkoutResult.body).toLowerCase();
+  return detail.includes("success_url")
+    || detail.includes("cancel_url")
+    || detail.includes("received non-200 response");
+}
+
+function buildCheckoutRedirectUrls(successUrl, cancelUrl, booking, room) {
+  return {
+    successUrl: appendQueryParams(successUrl, {
+      reference: booking.reference,
+      room: room.id,
+      opportunity: booking.ghlOpportunityId
+    }),
+    cancelUrl: appendQueryParams(cancelUrl, {
+      reference: booking.reference,
+      room: room.id,
+      opportunity: booking.ghlOpportunityId
+    })
+  };
+}
+
 export default async function handler(req, res) {
   if (req.method === "GET") {
     const config = resolvePaymongoConfig(process.env, PAYMENT_CONFIG);
@@ -197,7 +267,11 @@ export default async function handler(req, res) {
     if (!room) {
       return json(res, 404, {
         ok: false,
-        error: "Selected room could not be found."
+        error: "Selected room could not be found.",
+        details: {
+          roomId: cleanString(body.roomId, 120),
+          roomName: cleanString(body.roomName || body.room, 120)
+        }
       });
     }
 
@@ -223,16 +297,21 @@ export default async function handler(req, res) {
     }
 
     const booking = buildCheckoutBooking(body, room, financials);
-    const successUrl = appendQueryParams(paymongoConfig.successUrl, {
-      reference: booking.reference,
-      room: room.id,
-      opportunity: booking.ghlOpportunityId
-    });
-    const cancelUrl = appendQueryParams(paymongoConfig.cancelUrl, {
-      reference: booking.reference,
-      room: room.id,
-      opportunity: booking.ghlOpportunityId
-    });
+    const configuredRedirects = buildCheckoutRedirectUrls(
+      paymongoConfig.successUrl,
+      paymongoConfig.cancelUrl,
+      booking,
+      room
+    );
+    let successUrl = configuredRedirects.successUrl;
+    let cancelUrl = configuredRedirects.cancelUrl;
+    const attemptedRedirects = [
+      {
+        source: "configured_env",
+        successUrl,
+        cancelUrl
+      }
+    ];
 
     let paymongoPayload = buildPaymongoCheckoutPayload({
       booking,
@@ -252,27 +331,69 @@ export default async function handler(req, res) {
       }
     );
 
+    if (!checkoutResult.ok && isRedirectUrlError(checkoutResult)) {
+      const requestBaseUrl = resolveRequestBaseUrl(req);
+      const fallbackSuccess = requestBaseUrl ? `${requestBaseUrl}/payment-success` : "";
+      const fallbackCancel = requestBaseUrl ? `${requestBaseUrl}/payment-cancelled` : "";
+
+      if (fallbackSuccess && fallbackCancel) {
+        const fallbackRedirects = buildCheckoutRedirectUrls(
+          fallbackSuccess,
+          fallbackCancel,
+          booking,
+          room
+        );
+
+        if (
+          fallbackRedirects.successUrl !== successUrl
+          || fallbackRedirects.cancelUrl !== cancelUrl
+        ) {
+          successUrl = fallbackRedirects.successUrl;
+          cancelUrl = fallbackRedirects.cancelUrl;
+          attemptedRedirects.push({
+            source: "request_origin_fallback",
+            successUrl,
+            cancelUrl
+          });
+
+          paymongoPayload = buildPaymongoCheckoutPayload({
+            booking,
+            room,
+            financials,
+            paymongoConfig,
+            successUrl,
+            cancelUrl
+          });
+
+          checkoutResult = await fetchPaymongoJson(
+            resolvePaymongoCheckoutRoute(),
+            paymongoConfig.secretKey,
+            {
+              method: "POST",
+              body: JSON.stringify(paymongoPayload)
+            }
+          );
+        }
+      }
+    }
+
     if (!checkoutResult.ok && isDuplicateReferenceError(checkoutResult)) {
       booking.reference = buildRetryReference(booking.reference);
 
-      const retrySuccessUrl = appendQueryParams(paymongoConfig.successUrl, {
-        reference: booking.reference,
-        room: room.id,
-        opportunity: booking.ghlOpportunityId
-      });
-      const retryCancelUrl = appendQueryParams(paymongoConfig.cancelUrl, {
-        reference: booking.reference,
-        room: room.id,
-        opportunity: booking.ghlOpportunityId
-      });
+      const retryRedirects = buildCheckoutRedirectUrls(
+        successUrl.split("?")[0],
+        cancelUrl.split("?")[0],
+        booking,
+        room
+      );
 
       paymongoPayload = buildPaymongoCheckoutPayload({
         booking,
         room,
         financials,
         paymongoConfig,
-        successUrl: retrySuccessUrl,
-        cancelUrl: retryCancelUrl
+        successUrl: retryRedirects.successUrl,
+        cancelUrl: retryRedirects.cancelUrl
       });
 
       checkoutResult = await fetchPaymongoJson(
@@ -292,7 +413,8 @@ export default async function handler(req, res) {
         error: detail ? `PayMongo checkout error: ${detail}` : "Unable to create PayMongo checkout session.",
         status: checkoutResult.status,
         statusText: checkoutResult.statusText,
-        body: checkoutResult.body
+        body: checkoutResult.body,
+        attemptedRedirects
       });
     }
 
