@@ -124,6 +124,11 @@ export async function fetchPaymongoJson(path, secretKey, init = {}) {
     ok: response.ok,
     status: response.status,
     statusText: response.statusText,
+    headers: {
+      requestId: cleanString(response.headers.get("request-id"), 120),
+      xRequestId: cleanString(response.headers.get("x-request-id"), 120),
+      contentType: cleanString(response.headers.get("content-type"), 160)
+    },
     body: json || text
   };
 }

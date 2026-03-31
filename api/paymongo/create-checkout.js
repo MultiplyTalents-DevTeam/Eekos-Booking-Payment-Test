@@ -200,6 +200,27 @@ function buildCheckoutRedirectUrls(successUrl, cancelUrl, booking, room) {
   };
 }
 
+function buildCheckoutDebugContext({
+  room,
+  booking,
+  financials,
+  paymongoConfig,
+  attemptedRedirects
+}) {
+  return {
+    roomId: cleanString(room?.id, 120),
+    reference: cleanString(booking?.reference, 120),
+    nights: Number(financials?.nights || 0),
+    total: Number(financials?.total || 0),
+    deposit: Number(booking?.deposit || 0),
+    currency: cleanString(paymongoConfig?.currency, 10),
+    paymentMethodTypes: Array.isArray(paymongoConfig?.paymentMethodTypes)
+      ? paymongoConfig.paymentMethodTypes.map((method) => cleanString(method, 40)).filter(Boolean)
+      : [],
+    attemptedRedirects
+  };
+}
+
 export default async function handler(req, res) {
   if (req.method === "GET") {
     const config = resolvePaymongoConfig(process.env, PAYMENT_CONFIG);
@@ -488,11 +509,19 @@ export default async function handler(req, res) {
 
     if (!checkoutResult.ok) {
       const detail = extractPaymongoErrorText(checkoutResult.body);
+      const debugContext = buildCheckoutDebugContext({
+        room,
+        booking,
+        financials,
+        paymongoConfig,
+        attemptedRedirects
+      });
       console.error("[paymongo:create-checkout] create_failed", {
         status: checkoutResult.status,
         statusText: checkoutResult.statusText,
+        requestId: checkoutResult.headers?.requestId || checkoutResult.headers?.xRequestId || "",
         detail,
-        attemptedRedirects
+        ...debugContext
       });
 
       return json(res, 502, {
@@ -500,8 +529,10 @@ export default async function handler(req, res) {
         error: detail ? `PayMongo checkout error: ${detail}` : "Unable to create PayMongo checkout session.",
         status: checkoutResult.status,
         statusText: checkoutResult.statusText,
+        paymongoRequestId: checkoutResult.headers?.requestId || checkoutResult.headers?.xRequestId || "",
+        paymongoResponseHeaders: checkoutResult.headers || {},
         body: checkoutResult.body,
-        attemptedRedirects,
+        debugContext,
         debugHelper: "/api/paymongo/debug-helper"
       });
     }
