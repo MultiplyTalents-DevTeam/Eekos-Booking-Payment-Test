@@ -224,6 +224,15 @@ function buildHostedReturnUrls(baseUrl) {
   };
 }
 
+function resolveVercelProductionBaseUrl(env = process.env) {
+  const projectProductionHost = cleanString(env.VERCEL_PROJECT_PRODUCTION_URL, 240);
+  if (projectProductionHost) {
+    return `https://${projectProductionHost.replace(/^https?:\/\//i, "")}`;
+  }
+
+  return "";
+}
+
 export default async function handler(req, res) {
   if (req.method === "GET") {
     const config = resolvePaymongoConfig(process.env, PAYMENT_CONFIG);
@@ -344,6 +353,51 @@ export default async function handler(req, res) {
         body: JSON.stringify(paymongoPayload)
       }
     );
+
+    if (!checkoutResult.ok && isRedirectUrlError(checkoutResult)) {
+      const productionBaseUrl = resolveVercelProductionBaseUrl(process.env);
+      const productionHostedReturns = buildHostedReturnUrls(productionBaseUrl);
+
+      if (productionHostedReturns.successUrl && productionHostedReturns.cancelUrl) {
+        const productionRedirects = buildCheckoutRedirectUrls(
+          productionHostedReturns.successUrl,
+          productionHostedReturns.cancelUrl,
+          booking,
+          room
+        );
+
+        if (
+          productionRedirects.successUrl !== successUrl
+          || productionRedirects.cancelUrl !== cancelUrl
+        ) {
+          successUrl = productionRedirects.successUrl;
+          cancelUrl = productionRedirects.cancelUrl;
+          attemptedRedirects.push({
+            source: "vercel_production_hosted_return_fallback",
+            successUrl,
+            cancelUrl
+          });
+
+          paymongoPayload = buildPaymongoCheckoutPayload({
+            booking,
+            room,
+            financials,
+            paymongoConfig,
+            successUrl,
+            cancelUrl
+          });
+
+          checkoutResult = await fetchPaymongoJson(
+            resolvePaymongoCheckoutRoute(),
+            paymongoConfig.secretKey,
+            {
+              method: "POST",
+              body: JSON.stringify(paymongoPayload)
+            }
+          );
+        }
+      }
+    }
 
     if (!checkoutResult.ok && isRedirectUrlError(checkoutResult)) {
       const requestBaseUrl = resolveRequestBaseUrl(req);
